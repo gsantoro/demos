@@ -1,0 +1,68 @@
+# https://taskfile.dev
+
+version: '3'
+
+# NOTE:
+# {{.CREDENTIALS_FILE}} is a file that contains the credentials for the elastic user
+# {{.MANIFESTS_DIR}} is the directory containing the kustomize manifests
+
+includes:
+  k8s: 
+    taskfile: ./k8s.k3d.taskfile.yml
+    internal: true
+  helm: 
+    taskfile: ./helm.taskfile.yml
+    internal: true
+
+tasks:
+  up:
+    cmds:
+      - task: k8s:create
+      - task: elastic:operator-install
+      - task: elastic:up
+
+  down:
+    cmds:
+      - task: k8s:delete
+
+  elastic:operator-install:
+    internal: true
+    cmds:
+      - task: helm:up
+
+  elastic:up:
+    cmds:
+      - kubectl apply -k {{.MANIFESTS_DIR}}
+      - sleep 60 # wait for secret to be created
+      - task: elastic:credentials
+      # - task: elastic:test  # manual port forward 9200 first
+
+  elastic:down:
+    cmds:
+      - kubectl delete -k {{.MANIFESTS_DIR}}}
+      
+  elastic:logs:
+    cmds:
+      - kubectl logs -n {{.HELM_NAMESPACE}} sts/{{.HELM_RELEASE}}
+
+  elastic:credentials:
+    cmds:
+      - echo {{.PASSWORD}} > {{.CREDENTIALS_FILE}}
+    vars:
+      PASSWORD:
+        sh: kubectl -n {{.HELM_NAMESPACE}} get secret elasticsearch-es-elastic-user -o jsonpath="{.data.elastic }" | base64 -d
+
+
+  # Requires port forwarding of elastic port 9200
+  elastic:test:
+    cmds:
+      - curl -u "elastic:{{.PASSWORD}}" -k "https://localhost:9200"
+    vars:
+      PASSWORD:
+        sh: cat {{.CREDENTIALS_FILE}}
+
+  kibana:pf:
+    cmds:
+      - kubectl port-forward -n {{.HELM_NAMESPACE}} svc/kibana-kb-http 5601:5601
+
+  # sample dataset from https://github.com/iuliaferoli/harry-potter-search/blob/main/0.5.%20%20Importing%20Data.md

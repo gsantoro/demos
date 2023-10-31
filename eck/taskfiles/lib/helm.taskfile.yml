@@ -1,0 +1,47 @@
+version: '3'
+
+# Docs:
+# - https://helm.sh/docs/intro/quickstart/
+
+tasks:
+  repo:add:
+    desc: Add repo={{.HELM_REPO_NAME}}
+    cmds:
+      - helm repo add {{.HELM_REPO_NAME}} {{.HELM_REPO_URL}}
+
+  repo:update:
+    desc: Update repo
+    cmds:
+      - helm repo update
+
+  chart-values:
+    cmds:
+      - helm show values {{.HELM_CHART}}
+
+  release-values:
+    cmds:
+      - helm get values {{.HELM_RELEASE}} --namespace {{.HELM_NAMESPACE}} 
+
+  # Note: t helm:search -- mysql
+  search:
+    desc: Search for a chart
+    cmds:
+      - helm search repo {{.CLI_ARGS}}
+
+  install:
+    desc: Install a chart by name={{.HELM_CHART}} and release_name={{.HELM_RELEASE}}
+    cmds:
+      - helm install {{.HELM_RELEASE}} {{.HELM_CHART}} --namespace {{.HELM_NAMESPACE}} {{.HELM_PARAMS}}
+
+  uninstall:
+    desc: |
+      Uninstall a release by name: {{.HELM_RELEASE}}
+    cmds:
+      - helm uninstall {{.HELM_RELEASE}} --namespace {{.HELM_NAMESPACE}} 
+
+  # custom tasks
+  up:
+    cmds:
+      - task: repo:add
+      - task: repo:update
+      - task: install
