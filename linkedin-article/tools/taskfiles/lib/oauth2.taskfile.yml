@@ -1,0 +1,22 @@
+# https://taskfile.dev
+
+version: '3'
+
+tasks:
+  run:
+    cmds:
+      - task: code
+      - task: token
+
+  code:
+    cmds:
+      - echo "{{.AUTHORIZATION_URL}}?response_type=code&client_id={{.CLIENT_ID}}&redirect_uri={{.REDIRECT_URI}}&scope={{.SCOPE}}"
+
+  token:
+    cmds:
+      - http --print=b --form POST {{.ACCESS_TOKEN_URL}} grant_type=authorization_code code={{.AUTHORIZATION_CODE}} redirect_uri={{.REDIRECT_URI}} client_id={{.CLIENT_ID}} client_secret={{.CLIENT_SECRET}}
+    vars:
+      AUTHORIZATION_CODE:
+        sh: gum input --placeholder "Authorization code"
+
+

@@ -1,0 +1,94 @@
+# https://taskfile.dev
+
+version: '3'
+
+includes:
+  oauth2: ./oauth2.taskfile.yml
+
+vars:
+  AUTH_BASE_URL: https://www.linkedin.com/oauth/v2
+  API_BASE_URL: https://api.linkedin.com/v2
+
+  LINKEDIN_AUTHORIZATION_URL: '{{.AUTH_BASE_URL}}/authorization'
+  LINKEDIN_ACCESS_TOKEN_URL: '{{.AUTH_BASE_URL}}/accessToken'
+  
+  LINKEDIN_USER_INFO_URL: '{{.API_BASE_URL}}/userinfo'
+  LINKEDIN_POST_URL: '{{.API_BASE_URL}}/ugcPosts'
+
+  LINKEDIN_SCOPE: w_member_social%20email%20openid
+
+  LINKEDIN_REDIRECT_URI: https://oauth.pstmn.io/v1/browser-callback
+
+
+tasks:
+  # Note: Oauth2 for LinkedIn at https://learn.microsoft.com/en-us/linkedin/shared/authentication/authorization-code-flow?tabs=HTTPS1
+  # oauth2: Step 1: get the authorization code
+  oauth2-code:
+    internal: true    
+    cmds:
+      - task: oauth2:code
+        vars:
+          AUTHORIZATION_URL: "{{.LINKEDIN_AUTHORIZATION_URL}}"
+          CLIENT_ID: "{{.LINKEDIN_CLIENT_ID}}"
+          REDIRECT_URI: "{{.LINKEDIN_REDIRECT_URI}}"
+          SCOPE: "{{.LINKEDIN_SCOPE}}"
+
+  # oauth2: Step 2: get the access token
+  oauth2-token:
+    internal: true
+    cmds:
+      - task: oauth2:token
+        vars:
+          ACCESS_TOKEN_URL: "{{.LINKEDIN_ACCESS_TOKEN_URL}}"
+          CLIENT_ID: "{{.LINKEDIN_CLIENT_ID}}"
+          REDIRECT_URI: "{{.LINKEDIN_REDIRECT_URI}}"
+          CLIENT_SECRET: "{{.LINKEDIN_CLIENT_SECRET}}"
+
+  oauth2:
+    cmds:
+      - task: oauth2-code
+      - task: oauth2-token
+
+  request:
+    internal: true
+    cmds:
+      - http --print=b -A bearer -a {{.LINKEDIN_BEARER_TOKEN}} {{.REQ_ARGS}}
+
+  user-info:
+    cmds:
+      - task: request
+        vars:
+          REQ_ARGS: GET {{.LINKEDIN_USER_INFO_URL}}
+
+  article:
+    cmds:
+      - task: request
+        vars:
+          REQ_ARGS: POST {{.LINKEDIN_POST_URL}} --raw='{{.BODY}}'
+    vars:
+      AUTHOR_ID: '{{.LINKEDIN_AUTHOR_ID}}'
+      ARTICLE_CONTENT: 
+        sh: echo '{{.LINKEDIN_ARTICLE_CONTENT | default "content"}}' | sed ':a;N;$!ba;s/\n/\\n/g'
+      ARTICLE_URL: '{{.LINKEDIN_ARTICLE_URL | default "url"}}'
+      BODY: |
+        {
+            "author": "urn:li:person:{{.AUTHOR_ID}}",
+            "lifecycleState": "PUBLISHED",
+            "specificContent": {
+                "com.linkedin.ugc.ShareContent": {
+                    "shareCommentary": {
+                        "text": "{{.ARTICLE_CONTENT}}"
+                    },
+                    "shareMediaCategory": "ARTICLE",
+                    "media": [
+                        {
+                            "status": "READY",
+                            "originalUrl": "{{.ARTICLE_URL}}"
+                        }
+                    ]
+                }
+            },
+            "visibility": {
+                "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
+            }
+        }

@@ -1,0 +1,18 @@
+# https://taskfile.dev
+
+version: '3'
+
+includes:
+  linkedin: tools/taskfiles/lib/linkedin.taskfile.yml
+  oauth2: tools/taskfiles/lib/oauth2.taskfile.yml
+
+tasks:
+  li:post:
+    cmds:
+      - task: linkedin:article
+        vars:
+          LINKEDIN_ARTICLE_CONTENT: |
+            this is
+            a test post
+            on multiple lines
+          LINKEDIN_ARTICLE_URL: 'https://cloudnativeengineer.substack.com/p/news-4-layoffs-dev-containers-docker'
