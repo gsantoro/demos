@@ -1,0 +1,29 @@
+# https://taskfile.dev
+
+version: '3'
+
+tasks:
+  down:
+    cmds:
+      - rm data/weather.db
+    ignore_error: true
+
+  up: 
+    deps:
+      - down
+    cmds:
+      - task: import
+
+  default:
+    cmds:
+      - task: up
+
+  import:
+    cmds:
+      - sqlite3 {{.DB_PATH}} -batch ".import --csv {{.DATASET_PATH}} {{.DB_TABLE}}"
+
+  count:
+    cmds:
+      - |
+        sqlite3 {{.DB_PATH}} \
+          -batch "select count(*) from {{.DB_TABLE}};"

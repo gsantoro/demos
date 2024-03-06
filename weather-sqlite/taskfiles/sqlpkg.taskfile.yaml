@@ -1,0 +1,36 @@
+# https://taskfile.dev
+
+version: '3'
+
+# sqlpkg: https://github.com/nalgeon/sqlpkg-cli
+# Repo with packages: https://sqlpkg.org/
+tasks:
+  deps:
+    cmds:
+      - curl -sS https://webi.sh/sqlpkg | sh
+
+  install:
+    cmds:
+      - sqlpkg install {{.PKG_PATH}}
+    requires:
+      vars:
+        - PKG_PATH
+
+  unintall:
+    cmds:
+      - sqlpkg uninstall {{.PKG_PATH}}
+    requires:
+      vars:
+        - PKG_PATH
+
+  which:
+    desc: Return path to extension
+    cmds:
+      - sqlpkg which {{.PKG_PATH}}
+    requires:
+      vars:
+        - PKG_PATH
+
+  list:
+    cmds:
+      - sqlpkg list

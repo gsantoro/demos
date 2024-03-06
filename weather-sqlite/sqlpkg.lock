@@ -1,0 +1,33 @@
+{
+    "packages": {
+        "asg017/xsv": {
+            "owner": "asg017",
+            "name": "xsv",
+            "version": "v0.2.0",
+            "specfile": "https://github.com/nalgeon/sqlpkg/raw/main/pkg/asg017/xsv.json",
+            "assets": {
+                "path": "https://github.com/asg017/sqlite-xsv/releases/download/v0.2.0",
+                "files": {
+                    "darwin-amd64": "xsv0.dylib",
+                    "linux-amd64": "xsv0.so",
+                    "windows-amd64": "xsv0.dll"
+                }
+            }
+        },
+        "nalgeon/sqlean": {
+            "owner": "nalgeon",
+            "name": "sqlean",
+            "version": "0.21.9",
+            "specfile": "https://github.com/nalgeon/sqlean/raw/main/sqlpkg.json",
+            "assets": {
+                "path": "https://github.com/nalgeon/sqlean/releases/download/0.21.9",
+                "files": {
+                    "darwin-amd64": "sqlean-macos-x86.zip",
+                    "darwin-arm64": "sqlean-macos-arm64.zip",
+                    "linux-amd64": "sqlean-linux-x86.zip",
+                    "windows-amd64": "sqlean-win-x64.zip"
+                }
+            }
+        }
+    }
+}
