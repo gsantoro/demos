@@ -5,7 +5,8 @@ version: '3'
 
 includes:
   base: taskfiles/base.taskfile.yaml
-  xsv: taskfiles/xsv.taskfile.yaml
+  sqlite-xsv: taskfiles/sqlite-xsv.taskfile.yaml
+  sqlite-url: taskfiles/sqlite-url.taskfile.yaml
   sqlpkg: taskfiles/sqlpkg.taskfile.yaml
   sqlean: taskfiles/sqlean.taskfile.yaml
 

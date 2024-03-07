@@ -1,0 +1,48 @@
+# https://taskfile.dev
+
+version: '3'
+
+includes:
+  sqlpkg: ./sqlpkg.taskfile.yaml
+
+# XSV extension for CSV
+# Useful for very large files: https://github.com/asg017/sqlite-xsv  
+tasks:
+  install:
+    cmds:
+      - task: sqlpkg:install 
+        vars:
+          PKG_INSTALL_PATH: "asg017/xsv"
+
+  uninstall:
+    cmds:
+      - task: sqlpkg:uninstall 
+        vars:
+          PKG_INSTALL_PATH: "asg017/xsv"
+
+  which:
+    cmds:
+      - task: sqlpkg:which 
+        vars:
+          PKG_NAME: "asg017/xsv"
+
+  version:
+    cmds:
+      - |
+        sqlite3 {{.DB_PATH}} \
+        -batch ".load {{.PKG_PATH}}" \
+        -batch "select xsv_version()"
+    vars:
+      PKG_PATH:
+        sh: task sqlite-xsv:which 
+
+  count:
+    cmds:
+      - |
+        sqlite3 {{.DB_PATH}} \
+          -batch ".load {{.PKG_PATH}}" \
+          -batch "create virtual table temp.{{.DB_TABLE}} using \
+          csv(filename='{{.DATASET_PATH}}'); select count(*) from temp.{{.DB_TABLE}};"
+    vars:
+      PKG_PATH:
+        sh: task sqlite-xsv:which 

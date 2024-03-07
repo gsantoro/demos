@@ -1,0 +1,27 @@
+# https://taskfile.dev
+
+version: '3'
+
+includes:
+  sqlpkg: ./sqlpkg.taskfile.yaml
+
+# Extension for url functions
+# Useful url functions: https://github.com/asg017/sqlite-url
+tasks:
+  install:
+    cmds:
+      - task: sqlpkg:install 
+        vars:
+          PKG_INSTALL_PATH: asg017/url
+
+  uninstall:
+    cmds:
+      - task: sqlpkg:uninstall 
+        vars:
+          PKG_INSTALL_PATH: asg017/url
+
+  which:
+    cmds:
+      - task: sqlpkg:which 
+        vars:
+          PKG_NAME: asg017/url

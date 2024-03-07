@@ -5,29 +5,35 @@ version: '3'
 includes:
   sqlpkg: ./sqlpkg.taskfile.yaml
 
+
 # Sqlean: https://github.com/nalgeon/sqlean/tree/main
 tasks:
   install:
     cmds:
       - task: sqlpkg:install 
         vars:
-          PKG_PATH: github.com/nalgeon/sqlean
+          PKG_INSTALL_PATH: "github.com/nalgeon/sqlean"
 
   uninstall:
     cmds:
       - task: sqlpkg:uninstall 
         vars:
-          PKG_PATH: github.com/nalgeon/sqlean
+          PKG_INSTALL_PATH: "github.com/nalgeon/sqlean"
 
   which:
     cmds:
       - task: sqlpkg:which 
         vars:
-          PKG_PATH: nalgeon/sqlean
+          PKG_NAME: nalgeon/sqlean
 
   square:
     cmds:
       - |
         sqlite3 {{.DB_PATH}} \
-          -batch ".load .sqlpkg/nalgeon/sqlean/sqlean" \
+          -batch ".load {{.PKG_PATH}}" \
           -batch "select sqrt(9);"
+    vars:
+      PKG_NAME: nalgeon/sqlean
+      PKG_PATH:
+        sh: task sqlean:which 
+      

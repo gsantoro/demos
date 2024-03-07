@@ -11,25 +11,25 @@ tasks:
 
   install:
     cmds:
-      - sqlpkg install {{.PKG_PATH}}
+      - sqlpkg install {{.PKG_INSTALL_PATH}}
     requires:
       vars:
-        - PKG_PATH
+        - PKG_INSTALL_PATH
 
-  unintall:
+  uninstall:
     cmds:
-      - sqlpkg uninstall {{.PKG_PATH}}
+      - sqlpkg uninstall {{.PKG_INSTALL_PATH}}
     requires:
       vars:
-        - PKG_PATH
+        - PKG_INSTALL_PATH
 
   which:
     desc: Return path to extension
     cmds:
-      - sqlpkg which {{.PKG_PATH}}
+      - sqlpkg which {{.PKG_NAME}}
     requires:
       vars:
-        - PKG_PATH
+        - PKG_NAME
 
   list:
     cmds:
