@@ -11,6 +11,8 @@ tasks:
     requires:
       vars:
         - KUBE_STATE_METRICS_VERSION
+    status:
+      - kubectl get pods -n kube-system -l app.kubernetes.io/name=kube-state-metrics -o custom-columns=NAME:.metadata.name | grep kube-state-metrics
 
   ksm:delete:
     summary: |
@@ -20,6 +22,8 @@ tasks:
     requires:
       vars:
         - KUBE_STATE_METRICS_VERSION
+    status:
+      - kubectl get pods -n kube-system -l app.kubernetes.io/name=kube-state-metrics -o custom-columns=NAME:.metadata.name | grep -v kube-state-metrics
 
   taint-node1:
     cmds:

@@ -12,13 +12,25 @@ tasks:
       vars:
         - HELM_REPO_NAME
         - HELM_REPO_URL
+    status:
+      - helm repo list --output json | jq -r '.[].name' | grep {{.HELM_REPO_NAME}}
+
+  repo:delete:
+    desc: Delete repo={{.HELM_REPO_NAME}}
+    cmds:
+      - helm repo remove {{.HELM_REPO_NAME}}
+    requires:
+      vars:
+        - HELM_REPO_NAME
+    status:
+      - helm repo list --output json | jq -r '.[].name' | grep -v {{.HELM_REPO_NAME}}
 
   repo:update:
     desc: Update repo
     cmds:
       - helm repo update
 
-  chart-values:
+  chart:values:
     cmds:
       - helm show values {{.HELM_CHART}}
     requires:
@@ -39,29 +51,33 @@ tasks:
     cmds:
       - helm search repo {{.CLI_ARGS}}
 
-  install:
+  chart:install:
     desc: Install a chart by name={{.HELM_CHART}} and release_name={{.HELM_RELEASE}}
     cmds:
-      - helm install {{.HELM_RELEASE}} {{.HELM_CHART}} --namespace {{.HELM_NAMESPACE}} {{.HELM_PARAMS}}
+      - helm install {{.HELM_RELEASE}} {{.HELM_CHART}} {{.HELM_DEBUG_PARAMS}} --namespace {{.HELM_NAMESPACE}} {{.HELM_PARAMS}}
     requires: 
       vars:
         - HELM_RELEASE
         - HELM_CHART
         - HELM_NAMESPACE
         - HELM_PARAMS
+    vars:
+      HELM_DEBUG_PARAMS: ""
+    status:
+      - helm list --namespace {{.HELM_NAMESPACE}} --output json | jq -r '.[].name' | grep {{.HELM_RELEASE}}
 
-  install:dry-run:
+  chart:install:with-confirm:
     desc: Install a chart by name={{.HELM_CHART}} and release_name={{.HELM_RELEASE}}
     cmds:
-      - helm install {{.HELM_RELEASE}} {{.HELM_CHART}} --dry-run --debug --namespace {{.HELM_NAMESPACE}} {{.HELM_PARAMS}}
-    requires: 
-      vars:
-        - HELM_RELEASE
-        - HELM_CHART
-        - HELM_NAMESPACE
-        - HELM_PARAMS
+      - task: chart:install
+        vars:
+          HELM_DEBUG_PARAMS: "--dry-run --debug"
+      - gum confirm "Do you want to install the release?"
+      - task: chart:install
+    status:
+      - helm list --namespace {{.HELM_NAMESPACE}} --output json | jq -r '.[].name' | grep {{.HELM_RELEASE}}
 
-  uninstall:
+  chart:uninstall:
     desc: |
       Uninstall a release by name: {{.HELM_RELEASE}}
     cmds:
@@ -70,12 +86,12 @@ tasks:
       vars:
         - HELM_RELEASE
         - HELM_NAMESPACE
+    status:
+      - helm list --namespace {{.HELM_NAMESPACE}} --output json | jq -r '.[].name' | grep -v {{.HELM_RELEASE}}
 
   # custom tasks
   up:
     cmds:
       - task: repo:add
       - task: repo:update
-      - task: install:dry-run
-      - gum confirm "Do you want to install the release?"
-      - task: install
+      - task: chart:install:with-confirm

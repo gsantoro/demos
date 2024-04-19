@@ -21,10 +21,56 @@ tasks:
     cmds:
       - task: k8s:k3d:create
       - task: helm:up
+      - task: provider
+      - task: credentials
+      - task: provider:config
+      - task: bucket
+
+  down:
+    cmds:
+      - task: bucket:delete
 
   provider:
     cmds:
-      - kubectl apply -f manifest/aws/provider.yaml
+      - kubectl apply -f manifests/aws/provider.yaml
+    status:
+      - kubectl get provider -n crossplane-system | grep provider-aws-s3
+
+  credentials:
+    cmds:
+      - |
+        kubectl create secret generic aws-secret \
+        -n crossplane-system \
+        --from-file=creds=envs/aws/data/creds.toml
+    preconditions:
+      - test -f envs/aws/.env.private.creds
+    status:
+      - kubectl get secret aws-secret -n crossplane-system | grep aws-secret
+
+  credentials:delete:
+    cmds:
+      - kubectl delete secret aws-secret -n crossplane-system
+    status:
+      - kubectl get secret aws-secret -n crossplane-system | grep -v aws-secret
+
+  provider:config:
+    cmds:
+      - kubectl apply -f manifests/aws/provider-config.yaml
+    status:
+      - kubectl get providerconfig -n crossplane-system | grep providerconfig.aws
+
+  bucket:
+    cmds:
+      - kubectl create -f manifests/aws/s3.yaml
+    status:
+      - kubectl get bucket -n crossplane-system | grep crossplane-bucket
+
+  bucket:delete:
+    cmds:
+      - kubectl delete bucket {{.BUCKETS_TO_DELETE}}
+    vars:
+      BUCKETS_TO_DELETE: 
+        sh: kubectl get bucket -n crossplane-system -o jsonpath='{.items[0].metadata.name}' | gum filter
 
   default:
     cmds:
