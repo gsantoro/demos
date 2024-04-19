@@ -1,0 +1,94 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  TRAEFIK_PORT: 9000
+  TRAEFIK_LOCAL_PORT: 8090
+
+includes:
+  k8s:
+    taskfile: ./k8s.taskfile.yml
+    vars:
+      K8S_IMAGE_PREFIX: "rancher/k3s:" # prefix to identify docker container with k3d
+
+tasks:
+  # Note: get k3s versions from https://hub.docker.com/r/rancher/k3s/tags
+  create:
+    summary: |
+      Create a single node k8s cluster
+    deps:
+      - delete
+    cmds:
+      - k3d cluster create {{.K8S_CLUSTER_NAME}} --image rancher/k3s:{{.K3D_CLUSTER_VERSION}} -p "8081:80@loadbalancer"
+    requires:
+      vars:
+        - K8S_CLUSTER_NAME
+        - K3D_CLUSTER_VERSION
+    status:
+      - k3d cluster list -o json | jq -r '.[].name' | grep {{.K8S_CLUSTER_NAME}}
+
+  delete:
+    summary: |
+      Delete a multi node k8s cluster
+    cmds:
+      - k3d cluster delete {{.K8S_CLUSTER_NAME}}
+    requires:
+      vars:
+        - K8S_CLUSTER_NAME
+    # Note: don't delete the cluster if it doesn't exist
+    status:
+      - k3d cluster list -o json | jq -r '.[].name' | grep -v {{.K8S_CLUSTER_NAME}}
+
+  # setup
+  up:
+    summary: |
+      Setup a multi node k8s cluster
+
+      1. Create k8s cluster
+      2. Setup kube-state-metrics
+    cmds:
+      - task: create
+      - task: k8s:kube-state-metrics-create
+
+  down:
+    summary: |
+      Teardown a multi node k8s cluster
+    cmds:
+      - task: delete
+
+  traefik:pf:
+    cmds:
+      - kubectl -n kube-system port-forward deployment/traefik {{.TRAEFIK_LOCAL_PORT}}:{{.TRAEFIK_PORT}}
+    requires:
+      vars:
+        - TRAEFIK_PORT
+        - TRAEFIK_LOCAL_PORT
+
+  traefik:dashboard:
+    cmds:
+      - open http://localhost:{{.TRAEFIK_LOCAL_PORT}}/dashboard/
+    requires:
+      vars:
+        - TRAEFIK_LOCAL_PORT
+
+  load-image:
+    cmds:
+      - k3d image load {{.IMAGE_NAME}} -c {{.K8S_CLUSTER_NAME}}
+    requires:
+      vars:
+        - IMAGE_NAME
+        - K8S_CLUSTER_NAME
+
+  load-image-with-repo:
+    cmds:
+      - task: load-image
+        vars:
+          IMAGE_NAME: "{{.DOCKER_REPOSITORY}}/{{.DOCKER_USER}}/{{.IMAGE_NAME}}:{{.IMAGE_TAG}}"
+    requires:
+      vars:
+        - DOCKER_REPOSITORY
+        - DOCKER_USER
+        - IMAGE_NAME
+        - IMAGE_TAG
+        - K8S_CLUSTER_NAME

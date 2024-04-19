@@ -13,6 +13,13 @@ includes:
   helm: 
     taskfile: ./helm.taskfile.yml
     internal: true
+  vars:
+    HELM_REPO_NAME: elastic
+    HELM_REPO_URL: https://helm.elastic.co
+    HELM_RELEASE: elastic-operator
+    HELM_CHART: elastic/eck-operator
+    HELM_NAMESPACE: elastic-system 
+    HELM_PARAMS: --create-namespace
 
 tasks:
   up:
@@ -60,6 +67,10 @@ tasks:
     vars:
       PASSWORD:
         sh: cat {{.CREDENTIALS_FILE}}
+
+  elastic:pf:
+    cmds:
+      - kubectl port-forward -n {{.HELM_NAMESPACE}} svc/kibana-kb-http 9200:9200
 
   kibana:pf:
     cmds:

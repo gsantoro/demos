@@ -1,0 +1,31 @@
+# https://taskfile.dev
+
+version: '3'
+
+includes:
+  k8s:k3d: 
+    taskfile: ./k8s.k3d.taskfile.yml
+
+  helm: 
+    taskfile: ./helm.taskfile.yml
+    vars:
+      HELM_REPO_NAME: crossplane-stable
+      HELM_REPO_URL: https://charts.crossplane.io/stable
+      HELM_RELEASE: crossplane
+      HELM_CHART: crossplane-stable/crossplane
+      HELM_NAMESPACE: crossplane-system
+      HELM_PARAMS: --create-namespace
+  
+tasks:
+  up:
+    cmds:
+      - task: k8s:k3d:create
+      - task: helm:up
+
+  provider:
+    cmds:
+      - kubectl apply -f manifest/aws/provider.yaml
+
+  default:
+    cmds:
+      - task: up

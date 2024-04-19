@@ -1,0 +1,25 @@
+version: '3'
+
+vars:
+  NIX_EXTRA_FLAGS: --extra-experimental-features nix-command --extra-experimental-features flakes
+
+tasks:
+  install:
+    cmds:
+      - nix profile install --accept-flake-config nixpkgs#devenv {{.NIX_EXTRA_FLAGS}}
+    vars:
+      WHOAMI: 
+        sh: whoami
+
+  init:
+    cmds:
+      - devenv init
+
+  update:
+    cmds: 
+      - devenv update
+
+  # Note: t devenv:search -- gofmt
+  search:
+    cmds:
+      - devenv search {{.CLI_ARGS}}
