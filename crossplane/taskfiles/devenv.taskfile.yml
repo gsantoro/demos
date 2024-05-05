@@ -1,14 +1,29 @@
-version: '3'
-
-vars:
-  NIX_EXTRA_FLAGS: --extra-experimental-features nix-command --extra-experimental-features flakes
+version: "3"
 
 tasks:
   install:
     cmds:
-      - nix profile install --accept-flake-config nixpkgs#devenv {{.NIX_EXTRA_FLAGS}}
+      - nix-env -iA cachix -f https://cachix.org/api/v1/install
+      - task: trust-user
+      - cachix use devenv
+      - nix-env -if https://github.com/cachix/devenv/tarball/latest
     vars:
-      WHOAMI: 
+      WHOAMI:
+        sh: whoami
+
+  # Note: suggested installation method
+  install:flakes:
+    cmds: 
+      - task: trust-user
+      - nix profile install --accept-flake-config nixpkgs#devenv {{.EXTRA_PARAMS}}
+    vars:
+      EXTRA_PARAMS: --extra-experimental-features flakes --extra-experimental-features nix-command
+
+  trust-user:
+    cmds:
+      - echo "trusted-users = root {{.WHOAMI}}" | sudo tee -a /etc/nix/nix.conf && sudo pkill nix-daemon
+    vars:
+      WHOAMI:
         sh: whoami
 
   init:
@@ -16,7 +31,7 @@ tasks:
       - devenv init
 
   update:
-    cmds: 
+    cmds:
       - devenv update
 
   # Note: t devenv:search -- gofmt

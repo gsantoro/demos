@@ -17,18 +17,28 @@ includes:
       HELM_PARAMS: --create-namespace
   
 tasks:
-  up:
+  config:
     cmds:
       - task: k8s:k3d:create
       - task: helm:up
       - task: provider
       - task: credentials
       - task: provider:config
+
+  config:delete:
+    cmds:
+      - task: k8s:k3d:delete
+
+  up:
+    deps:
+      - config
+    cmds:
       - task: bucket
 
   down:
     cmds:
       - task: bucket:delete
+      - task: config:delete
 
   provider:
     cmds:
@@ -36,14 +46,27 @@ tasks:
     status:
       - kubectl get provider -n crossplane-system | grep provider-aws-s3
 
+  credentials:file:
+    cmds:
+      - |
+        cat << EOF > envs/aws/data/creds.toml
+        [default]
+        aws_access_key_id = "$(cat envs/aws/.env.private.creds | grep AWS_ACCESS_KEY_ID | cut -d'=' -f2)"
+        aws_secret_access_key = "$(cat envs/aws/.env.private.creds | grep AWS_SECRET_ACCESS_KEY | cut -d'=' -f2)"
+        EOF
+    preconditions:
+      - test -f envs/aws/.env.private.creds
+    status:
+      - test -f envs/aws/data/creds.toml
+
   credentials:
+    deps:
+      - credentials:file
     cmds:
       - |
         kubectl create secret generic aws-secret \
         -n crossplane-system \
         --from-file=creds=envs/aws/data/creds.toml
-    preconditions:
-      - test -f envs/aws/.env.private.creds
     status:
       - kubectl get secret aws-secret -n crossplane-system | grep aws-secret
 

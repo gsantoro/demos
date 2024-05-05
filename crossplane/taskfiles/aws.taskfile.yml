@@ -1,0 +1,33 @@
+# https://taskfile.dev
+
+version: '3'
+
+tasks:
+
+  up:
+    deps:
+      - config
+    cmds:
+      - task: bucket
+
+  down:
+    cmds:
+
+  credentials:file:
+    cmds:
+      - |
+        cat << EOF > envs/aws/.env.private.creds
+        AWS_ACCESS_KEY_ID={{.AWS_ACCESS_KEY_ID}}
+        AWS_SECRET_ACCESS_KEY={{.AWS_SECRET_ACCESS_KEY}}
+        EOF
+    status:
+      - test -f envs/aws/.env.private.creds
+    vars:
+      AWS_ACCESS_KEY_ID: 
+        sh: gum input --placeholder "Provide the value for the AWS_ACCESS_KEY_ID" --secret
+      AWS_SECRET_ACCESS_KEY: 
+        sh: gum input --placeholder "Provide the value for the AWS_SECRET_ACCESS_KEY" --secret
+
+  default:
+    cmds:
+      - task: up

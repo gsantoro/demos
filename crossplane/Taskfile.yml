@@ -6,14 +6,9 @@ includes:
   # Note: copied from https://github.com/gsantoro/taskfiles
   devenv: taskfiles/devenv.taskfile.yml
   nix: taskfiles/nix.taskfile.yml
-  
-  crossplane: taskfiles/crossplane.taskfile.yml
   k8s.k3d: taskfiles/k8s.k3d.taskfile.yml
   k8s: taskfiles/k8s.taskfile.yml
   helm: taskfiles/helm.taskfile.yml
-
-tasks:
-  default:
-    cmds:
-      - echo "{{.GREETING}}"
-    silent: true
+  
+  crossplane: taskfiles/crossplane.taskfile.yml
+  aws: taskfiles/aws.taskfile.yml
