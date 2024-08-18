@@ -11,10 +11,23 @@ version: '3'
 includes:
   go: ./go.taskfile.yml
   docker: ./docker.taskfile.yml
+  k3d: ./k8s.k3d.taskfile.yml
 
 tasks:  
   default:
     cmds:
       - task: go:build
-      - task: docker:build
-      - task: docker:run
+      - task: docker:deploy
+      - task: k8s
+
+  up:
+    cmds:
+      - task: k3d:create
+
+  down:
+    cmds:
+      - task: k3d:delete
+
+  k8s:
+    cmds:
+      - kubectl apply -k deploy/kubernetes
