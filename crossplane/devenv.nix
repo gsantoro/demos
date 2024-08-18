@@ -7,6 +7,7 @@
     pkgs.kubernetes-helm
     pkgs.k3d
     pkgs.awscli2
+    pkgs.dotenvx
   ];
 
   dotenv.disableHint = true;

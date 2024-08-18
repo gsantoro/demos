@@ -1,0 +1,20 @@
+version: '3'
+
+# golang
+# ----------------------------------------------------------------
+#
+# note: run from ../Taskfile.yml
+
+# tools:
+# - https://sonarcloud.io/
+
+includes:
+  go: ./go.taskfile.yml
+  docker: ./docker.taskfile.yml
+
+tasks:  
+  default:
+    cmds:
+      - task: go:build
+      - task: docker:build
+      - task: docker:run

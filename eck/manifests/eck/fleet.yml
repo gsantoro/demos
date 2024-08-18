@@ -26,7 +26,7 @@ metadata:
   name: elastic-agent
   namespace: elastic-system
 spec:
-  version: 8.10.2
+  version: 8.14.1
   kibanaRef:
     name: kibana
   fleetServerRef:

@@ -3,7 +3,7 @@ kind: Kustomization
 resources:
   - es.yml
   - kibana.yml
-  - service-account.yml
-  - cluster-role.yml
-  - cluster-role-binding.yml
-  - fleet.yml
+  # - service-account.yml
+  # - cluster-role.yml
+  # - cluster-role-binding.yml
+  # - fleet.yml

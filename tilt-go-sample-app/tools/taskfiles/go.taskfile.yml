@@ -1,0 +1,107 @@
+version: '3'
+
+# golang
+# ----------------------------------------------------------------
+#
+# note: run from ../Taskfile.yml
+
+# tools:
+# - https://sonarcloud.io/
+
+tasks:  
+  kill:
+    cmds:
+      - echo "Killing server process."
+      - pkill {{.COMMAND}} || true
+
+  build:
+    deps:
+      - mod:tidy
+    cmds:
+      - CGO_ENABLED=0 GOOS={{.CMD_GOOS}} GOARCH={{.CMD_GOARCH}} go build -v -tags=go_json -o build/{{.COMMAND}} cmd/{{.COMMAND}}.go
+    requires:
+      vars: 
+        - CMD_GOOS
+        - CMD_GOARCH
+        - COMMAND
+
+
+  build-clean:
+    cmds:
+      - echo "Removing old binary"
+      - rm -rf ../build/* || true
+
+  run:  
+    cmds: 
+      - ./build/{{.COMMAND}}
+    requires:
+      vars: 
+        - COMMAND
+
+  lint:
+    cmds:
+      - golangci-lint run --fast ./...
+  
+  fmt:
+    cmds:
+      - gofmt -l -w ..
+
+
+  # udpate dependencies
+  mod:init:
+    cmds:
+      - go mod init github.com/{{.USERNAME}}/{{.REPO_NAME}}
+    vars:
+      USERNAME:
+        sh: whoami
+      REPO_NAME:
+        sh: gum input --placeholder "Repo name"
+
+  mod:tidy:
+    cmds:
+      - go get -u ./...
+      - go mod tidy
+
+  mod:graph:
+    cmds:
+      - go mod graph
+
+  mod:
+    cmds:
+      - task: mod:init
+      - task: mod:tidy
+
+  # NOTE: kill and rebuild. Used by .air.toml
+  rebuild:
+    cmds: 
+      - task: kill
+      - task: build-clean
+      # - task: swagger:init # todo: fix error
+      - task: fmt
+      - task: lint
+      # - task: vuln
+      - task: build
+
+  health:
+    cmds:
+      - open http://{{.HOSTNAME}}:{{.PORT}}/api/v1/health
+    requires:
+      vars:
+        - HOSTNAME
+        - PORT
+
+  dev:
+    cmds: 
+      - air -c .air.toml
+
+  vuln:
+    cmds:
+      - govulncheck ./...
+
+  ping:
+    cmds:
+      - curl http://{{.HOSTNAME}}:{{.PORT}}/api/v1/ping
+    requires:
+      vars:
+        - HOSTNAME
+        - PORT

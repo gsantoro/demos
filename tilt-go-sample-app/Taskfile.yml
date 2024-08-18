@@ -1,0 +1,17 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  GREETING: Hello, World!
+
+includes:
+  go: tools/taskfiles/go.taskfile.yml
+  docker: tools/taskfiles/docker.taskfile.yml
+  k8s: tools/taskfiles/k8s.taskfile.yml
+  app: tools/taskfiles/app.taskfile.yml  
+
+tasks:
+  default:
+    cmds:
+      - task: app

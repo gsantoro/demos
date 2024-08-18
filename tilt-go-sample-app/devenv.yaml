@@ -1,6 +1,6 @@
 inputs:
   nixpkgs:
-    # url: github:cachix/devenv-nixpkgs/rolling   # default
+    # url: github:cachix/devenv-nixpkgs/rolling  # default
     url: github:NixOS/nixpkgs/nixpkgs-unstable
 
 # If you're using non-OSS software, you can set allowUnfree to true.

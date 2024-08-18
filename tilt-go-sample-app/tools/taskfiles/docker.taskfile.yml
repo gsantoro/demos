@@ -1,0 +1,202 @@
+version: '3'
+
+# Docker
+# ----------------------------------------------------------------
+
+tasks:
+  build:
+    desc: Build code (for amd64), build image with that app
+    cmds:
+      - task: image-build
+
+  image-build:
+    desc: Build a docker image
+    cmds:
+      - docker build -t {{.DOCKER_IMAGE}}:{{.DOCKER_TAG}} -f {{.DOCKER_FILE}} .
+    requires:
+      vars:
+        - DOCKER_IMAGE
+        - DOCKER_TAG
+        - DOCKER_FILE
+
+  run:
+    desc: Run a docker container
+    cmds: 
+      - docker run -it -p {{.PORT}}:{{.PORT}} --env-file {{.ENV_FILE}} {{.DOCKER_IMAGE}}:{{.DOCKER_TAG}} 
+    requires:
+      vars:
+        - PORT
+        - ENV_FILE
+        - DOCKER_IMAGE
+        - DOCKER_TAG
+
+  deploy:
+    cmds: 
+      - task: build
+      - task: tag
+      - task: push
+
+  tag:
+    cmds:
+      - docker tag {{.DOCKER_IMAGE_ID}} {{.DOCKER_REPOSITORY}}/{{.DOCKER_USER}}/{{.DOCKER_IMAGE}}:{{.DOCKER_TAG}}
+    vars:
+      DOCKER_IMAGE_ID:
+        sh: docker images {{.DOCKER_IMAGE}}:{{.DOCKER_TAG}} --format '{{`{{.ID}}`}}'
+    requires:
+      vars:
+        - DOCKER_REPOSITORY
+        - DOCKER_USER
+        - DOCKER_IMAGE
+        - DOCKER_TAG
+
+  push:
+    cmds:
+      - docker push {{.DOCKER_REPOSITORY}}/{{.DOCKER_USER}}/{{.DOCKER_IMAGE}}:{{.DOCKER_TAG}}
+    requires:
+      vars:
+        - DOCKER_REPOSITORY
+        - DOCKER_USER
+        - DOCKER_IMAGE
+        - DOCKER_TAG
+
+  rmi:
+    cmds:
+      - docker rmi {{.DOCKER_REPOSITORY}}/{{.DOCKER_USER}}/{{.DOCKER_IMAGE}}:{{.DOCKER_TAG}}
+    requires:
+      vars:
+        - DOCKER_REPOSITORY
+        - DOCKER_USER
+        - DOCKER_IMAGE
+        - DOCKER_TAG
+
+  inspect:
+    cmds:
+      - docker inspect {{.DOCKER_REPOSITORY}}/{{.DOCKER_USER}}/{{.DOCKER_IMAGE}}
+    requires:
+      vars:
+        - DOCKER_REPOSITORY
+        - DOCKER_USER
+        - DOCKER_IMAGE
+
+  pull:
+    cmds:
+      - docker pull {{.DOCKER_REPOSITORY}}/{{.DOCKER_USER}}/{{.DOCKER_IMAGE}}:{{.DOCKER_TAG}}
+    requires:
+      vars:
+        - DOCKER_REPOSITORY
+        - DOCKER_USER
+        - DOCKER_IMAGE
+        - DOCKER_TAG
+
+  shell:
+    summary: Open a shell into a running container. It requires /bin/sh to be part of the container image.
+    cmds:
+      - docker exec -it {{.DOCKER_ID}} /bin/sh
+    vars:
+      DOCKER_ID:
+        sh: docker ps --filter ancestor={{.DOCKER_IMAGE}} --format '{{`{{.Names}}`}}'
+    requires:
+      vars:
+        - DOCKER_IMAGE
+
+  up:
+    cmds:
+      - task: build
+      - task: run
+
+  login:
+    cmds:
+      - docker login {{.DOCKER_REPOSITORY}}
+    requires:
+      vars:
+        - DOCKER_REPOSITORY
+
+  login-with-pass:
+    cmds:
+      - echo {{.DOCKER_PASSWORD}} | docker login {{.DOCKER_REPOSITORY}} -u {{.DOCKER_USER}} --password-stdin
+    requires:
+      vars:
+        - DOCKER_REPOSITORY
+        - DOCKER_USER
+        - DOCKER_PASSWORD
+
+  login-with-ghcr:
+    cmds:
+      - ./bin/ghcr-get-token.sh | sed 's/GHCR_TOKEN=//g' | docker login {{.DOCKER_REPOSITORY}} -u {{.DOCKER_USER}} --password-stdin
+    requires:
+      vars:
+        - DOCKER_REPOSITORY
+        - DOCKER_USER
+
+  ghcr-init:
+    cmds: 
+      - envchain --set ghcr GHCR_TOKEN
+
+  logout:
+    cmds:
+      - docker logout {{.DOCKER_REPOSITORY}}
+    requires:
+      vars:
+        - DOCKER_REPOSITORY
+
+  dive:
+    cmds:
+      - dive {{.DOCKER_REPOSITORY}}/{{.DOCKER_USER}}/{{.DOCKER_IMAGE}}:{{.DOCKER_TAG}}
+    requires: 
+      vars:
+        - DOCKER_REPOSITORY
+        - DOCKER_USER
+        - DOCKER_IMAGE
+        - DOCKER_TAG
+
+  security:
+    desc: Security scanning
+    cmds:
+      - task: docker-cve
+      - task: trivy:image
+
+  # Note: more security tools
+  # - snyk: https://app.snyk.io
+  # - github code scanning: https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/about-code-scanning
+  # - github secret scanning: https://docs.github.com/en/code-security/secret-scanning/about-secret-scanning 
+  cve:
+    cmds: 
+      - docker scout cves {{.DOCKER_REPOSITORY}}/{{.DOCKER_USER}}/{{.DOCKER_IMAGE}}:{{.DOCKER_TAG}}
+    requires:
+      vars:
+        - DOCKER_REPOSITORY
+        - DOCKER_USER
+        - DOCKER_IMAGE
+        - DOCKER_TAG
+
+  slim:
+    cmds:
+      # NOTE: if docker context point to remote host, this command doesn't work
+      # it needs to be run from remote host. Image will be available locally after build
+      - slim build --env PORT={{.PORT}} --expose 8080 {{.DOCKER_IMAGE}}:{{.DOCKER_TAG}}
+    requires:
+      vars:
+        - PORT
+        - DOCKER_IMAGE
+        - DOCKER_TAG
+
+  ## cleanup:
+  # Note: multiple selection works with `TAB` keyword
+  prune-by-image-and-tag:
+    cmds:
+      - docker images | grep -E "{{.IMAGE_NAMES}}" | grep -E "{{.IMAGE_TAGS}}" | awk '{print $3}' | xargs -I{} docker rmi {}
+    vars:
+      ALL_IMAGE_NAMES: 
+        # note: `tail -n +2` to remove header
+        sh: docker images | awk '{print $1}' | sort -u | tail -n +2
+      IMAGE_NAMES: 
+        # Note: `sed 's/.\{1\}$//'` remove last "|" which is not necessary and would break the grep
+        sh: echo "{{.ALL_IMAGE_NAMES}}" | gum filter --no-limit --placeholder "Pick one or more image name" | tr "\n" "\|" | sed 's/.\{1\}$//'
+      IMAGE_TAGS_FOR_IMAGE_NAMES:
+        sh: docker images | grep -E "{{.IMAGE_NAMES}}" | awk '{print $2}' | sort -u 
+      IMAGE_TAGS: 
+        sh: echo "{{.IMAGE_TAGS_FOR_IMAGE_NAMES}}" | gum filter --no-limit --placeholder "Pick or more image tags"
+    requires:
+      vars:
+        - IMAGE_NAMES
+        - IMAGE_TAGS
