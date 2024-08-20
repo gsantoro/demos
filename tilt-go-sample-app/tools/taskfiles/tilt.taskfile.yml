@@ -1,0 +1,21 @@
+version: '3'
+
+includes:
+  k3d: ./k8s.k3d.taskfile.yml
+
+tasks:  
+  init:
+    cmds:
+      - tilt init
+  up:
+    cmds:
+      - tilt up
+
+  restart:
+    cmds:
+      - tilt down
+      - tilt up
+
+  down:
+    cmds:
+      - tilt down

@@ -1,0 +1,28 @@
+# -*- mode: Python -*-
+
+load('ext://restart_process', 'docker_build_with_restart')
+
+local_resource(
+  'compile',
+  'CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o build/hello cmd/hello.go',
+  ignore=['build'],
+  deps=['cmd/hello.go', 'go.mod', 'go.sum'])
+
+docker_build_with_restart(
+  'ttl.sh/tilt-go-sample-app',
+  '.',
+  entrypoint=['/app/hello'],
+  dockerfile='deploy/docker/Dockerfile',
+  only=[
+    './build'
+  ],
+  live_update=[
+    sync('./build', '/app')
+  ]
+)
+
+# k8s_yaml(kustomize('deploy/kustomize/'))
+k8s_yaml('deploy/kubernetes.dev/pod.yaml')
+
+k8s_resource('tilt-go-sample-app', port_forwards=8085,
+             resource_deps=['compile'])

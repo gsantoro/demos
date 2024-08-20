@@ -1,0 +1,101 @@
+STEP 1/5 — Building Dockerfile: [ttl.sh/tilt-go-sample-app-tilt_docker_build_with_restart_base]
+Building Dockerfile for platform linux/amd64:
+  FROM cgr.dev/chainguard/wolfi-base:latest@sha256:3490ac41510e17846b30c9ebfc4a323dfdecbd9a35e7b0e4e745a8f496a18f25
+  
+  RUN mkdir /app
+  
+  COPY build/ /app
+  
+  CMD ["/app/hello"]
+
+     Building image
+     [background] read source files 11.31MB [done: 33ms]
+     [1/3] FROM cgr.dev/chainguard/wolfi-base:latest@sha256:3490ac41510e17846b30c9ebfc4a323dfdecbd9a35e7b0e4e745a8f496a18f25
+     [3/3] COPY build/ /app [cached]
+     [2/3] RUN mkdir /app [cached]
+     exporting to image
+
+STEP 2/5 — Pushing ttl.sh/tilt-go-sample-app-tilt_docker_build_with_restart_base:tilt-bfd8fc7f57d72317
+     Skipping push: base image does not need deploy
+
+STEP 3/5 — Building Dockerfile: [ttl.sh/tilt-go-sample-app]
+Building Dockerfile for platform linux/amd64:
+  
+  FROM tiltdev/restart-helper:2024-06-06 as restart-helper
+  
+  FROM ttl.sh/tilt-go-sample-app-tilt_docker_build_with_restart_base:tilt-bfd8fc7f57d72317
+  RUN ["touch", "/tmp/.restart-proc"]
+  RUN ["chmod", "666", "/tmp/.restart-proc"]
+  COPY --from=restart-helper /tilt-restart-wrapper /
+  COPY --from=restart-helper /entr /
+  ENTRYPOINT ["/tilt-restart-wrapper", "--watch_file=/tmp/.restart-proc", "/app/hello"]
+
+
+     Building image
+     [restart-helper 1/1] FROM docker.io/tiltdev/restart-helper:2024-06-06@sha256:763d4aa73367c8711c0a78e297e4c4f3af6dd18929d4b7fbec10ebfc4065ef06
+     [stage-1 1/5] FROM ttl.sh/tilt-go-sample-app-tilt_docker_build_with_restart_base:tilt-bfd8fc7f57d72317
+     [stage-1 5/5] COPY --from=restart-helper /entr / [cached]
+     [stage-1 4/5] COPY --from=restart-helper /tilt-restart-wrapper / [cached]
+     [stage-1 3/5] RUN ["chmod", "666", "/tmp/.restart-proc"] [cached]
+     [stage-1 2/5] RUN ["touch", "/tmp/.restart-proc"] [cached]
+     exporting to image
+
+STEP 4/5 — Pushing ttl.sh/tilt-go-sample-app:tilt-8bc5b21493c36f2f
+     Pushing with Docker client
+     Authenticating to image repo: ttl.sh
+     Sending image data
+     aaec25a13f40: Layer already exists 
+     8da6af99897e: Layer already exists 
+     e604432584f2: Layer already exists 
+     4cb4fda84aef: Layer already exists 
+     3ab3b672f9f8: Layer already exists 
+     60a4eb4e7b6e: Layer already exists 
+     57b035d92314: Layer already exists 
+
+STEP 5/5 — Deploying
+     Applying YAML to cluster
+     Resource tilt-go-sample-app is currently being deleted. Waiting 1m for deletion before retrying...
+     Objects applied to cluster:
+       → tilt-go-sample-app:pod
+
+     Step 1 - 1.16s (Building Dockerfile: [ttl.sh/tilt-go-sample-app-tilt_docker_build_with_restart_base])
+     Step 2 - 0.00s (Pushing ttl.sh/tilt-go-sample-app-tilt_docker_build_with_restart_base:tilt-bfd8fc7f57d72317)
+     Step 3 - 0.99s (Building Dockerfile: [ttl.sh/tilt-go-sample-app])
+     Step 4 - 4.79s (Pushing ttl.sh/tilt-go-sample-app:tilt-8bc5b21493c36f2f)
+     Step 5 - 0.01s (Deploying)
+     DONE IN: 6.95s 
+
+
+Tracking new pod rollout (tilt-go-sample-app):
+     ┊ Scheduled       - <1s
+     ┊ Initialized     - <1s
+     ┊ Ready           - 1s
+[event: pod tilt-go-sample-app] Container image "ttl.sh/tilt-go-sample-app:tilt-8bc5b21493c36f2f" already present on machine
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /                         --> main.main.func1 (3 handlers)
+[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
+Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
+[GIN-debug] Listening and serving HTTP on :8085
+
+
+---
+
+Will copy 1 file(s) to container: [tilt-go-sample-app/tilt-go-sample-app]
+- '/home/gsantoro/workspace/demos/tilt-go-sample-app/build/hello' --> '/app/hello'
+[CMD 1/1] sh -c date > /tmp/.restart-proc
+  → Container tilt-go-sample-app/tilt-go-sample-app updated!
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /                         --> main.main.func1 (3 handlers)
+[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
+Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
+[GIN-debug] Listening and serving HTTP on :8085

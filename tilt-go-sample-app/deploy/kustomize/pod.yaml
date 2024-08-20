@@ -1,13 +1,4 @@
 apiVersion: v1
-data:
-  HOSTNAME: 0.0.0.0
-  PORT: "8085"
-kind: ConfigMap
-metadata:
-  name: app
-  namespace: default
----
-apiVersion: v1
 kind: Pod
 metadata:
   labels:
@@ -15,7 +6,7 @@ metadata:
   name: tilt-go-sample-app
 spec:
   containers:
-  - image: docker.io/gsantoro/tilt-go-sample-app:latest
+  - image: ttl.sh/tilt-go-sample-app:latest
     name: tilt-go-sample-app
     envFrom:
     - configMapRef:

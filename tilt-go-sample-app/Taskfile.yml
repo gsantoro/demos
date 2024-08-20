@@ -10,6 +10,7 @@ includes:
   docker: tools/taskfiles/docker.taskfile.yml
   k3d: tools/taskfiles/k8s.k3d.taskfile.yml
   app: tools/taskfiles/app.taskfile.yml  
+  tilt: tools/taskfiles/tilt.taskfile.yml
 
 tasks:
   default:

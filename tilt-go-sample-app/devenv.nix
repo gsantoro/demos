@@ -8,7 +8,9 @@
     pkgs.golangci-lint 
     pkgs.crane 
     pkgs.dive 
-    pkgs.k3d 
+    pkgs.k3d
+    pkgs.tilt
+    pkgs.kustomize
   ];
 
   languages.go = {

@@ -15,7 +15,7 @@ metadata:
   name: tilt-go-sample-app
 spec:
   containers:
-  - image: docker.io/gsantoro/tilt-go-sample-app:latest
+  - image: ttl.sh/tilt-go-sample-app:latest
     name: tilt-go-sample-app
     envFrom:
     - configMapRef:
