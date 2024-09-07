@@ -14,9 +14,12 @@ spec:
       spec:
         containers:
         - name: elasticsearch
+          env:
+          - name: ES_JAVA_OPTS
+            value: -Xms6g -Xmx6g
           resources:
             requests:
-              memory: 2Gi
-              cpu: 1
+              memory: 8Gi
+              cpu: 4
             limits:
-              memory: 2Gi
+              memory: 8Gi
