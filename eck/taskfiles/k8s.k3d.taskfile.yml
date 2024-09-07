@@ -17,9 +17,13 @@ tasks:
     deps: 
       - delete
     cmds:
-      # - k3d cluster create {{.K3D_CLUSTER_NAME}} --image rancher/k3s:{{.K3D_CLUSTER_VERSION}}
-      - k3d cluster create {{.K3D_CLUSTER_NAME}}
-      # "8081:80@loadbalancer"
+      - k3d cluster create {{.K3D_CLUSTER_NAME}} --image rancher/k3s:{{.K3D_CLUSTER_VERSION}} --agents 3 --agents-memory 4G 
+# "8081:80@loadbalancer"
+    requires:
+      vars:
+        - K3D_CLUSTER_NAME
+        - K3D_CLUSTER_VERSION
+
 
   delete:
     summary: |

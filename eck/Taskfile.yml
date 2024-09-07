@@ -3,7 +3,7 @@
 version: '3'
 
 includes:
-  eck: taskfiles/lib/eck.taskfile.yml
+  eck: ./taskfiles/eck.taskfile.yml
 
 tasks:
   default:

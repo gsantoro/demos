@@ -10,16 +10,17 @@ includes:
   k8s: 
     taskfile: ./k8s.k3d.taskfile.yml
     internal: true
+
   helm: 
     taskfile: ./helm.taskfile.yml
     internal: true
-  vars:
-    HELM_REPO_NAME: elastic
-    HELM_REPO_URL: https://helm.elastic.co
-    HELM_RELEASE: elastic-operator
-    HELM_CHART: elastic/eck-operator
-    HELM_NAMESPACE: elastic-system 
-    HELM_PARAMS: --create-namespace
+    vars:
+      HELM_REPO_NAME: elastic
+      HELM_REPO_URL: https://helm.elastic.co
+      HELM_RELEASE: elastic-operator
+      HELM_CHART: elastic/eck-operator
+      HELM_NAMESPACE: "{{.ELASTIC_NAMESPACE}}"
+      HELM_PARAMS: --create-namespace
 
 tasks:
   up:
@@ -39,7 +40,8 @@ tasks:
 
   elastic:up:
     cmds:
-      - kubectl apply -k {{.MANIFESTS_DIR}}
+      # - kubectl apply -k {{.MANIFESTS_DIR}}
+      - kustomize build {{.MANIFESTS_DIR}} | envsubst | kubectl apply --wait -f - 
       - sleep 60 # wait for secret to be created
       - task: elastic:credentials
       # - task: elastic:test  # manual port forward 9200 first
@@ -50,14 +52,14 @@ tasks:
       
   elastic:logs:
     cmds:
-      - kubectl logs -n {{.HELM_NAMESPACE}} sts/{{.HELM_RELEASE}}
+      - kubectl logs -n {{.ELASTIC_NAMESPACE}} sts/{{.HELM_RELEASE}}
 
   elastic:credentials:
     cmds:
       - echo {{.PASSWORD}} > {{.CREDENTIALS_FILE}}
     vars:
       PASSWORD:
-        sh: kubectl -n {{.HELM_NAMESPACE}} get secret elasticsearch-es-elastic-user -o jsonpath="{.data.elastic }" | base64 -d
+        sh: kubectl -n {{.ELASTIC_NAMESPACE}} get secret elasticsearch-es-elastic-user -o jsonpath="{.data.elastic }" | base64 -d
 
 
   # Requires port forwarding of elastic port 9200
@@ -70,10 +72,10 @@ tasks:
 
   elastic:pf:
     cmds:
-      - kubectl port-forward -n {{.HELM_NAMESPACE}} svc/kibana-kb-http 9200:9200
+      - kubectl port-forward -n {{.ELASTIC_NAMESPACE}} svc/kibana-kb-http 9200:9200
 
   kibana:pf:
     cmds:
-      - kubectl port-forward -n {{.HELM_NAMESPACE}} svc/kibana-kb-http 5601:5601
+      - kubectl port-forward -n {{.ELASTIC_NAMESPACE}} svc/kibana-kb-http 5601:5601
 
   # sample dataset from https://github.com/iuliaferoli/harry-potter-search/blob/main/0.5.%20%20Importing%20Data.md

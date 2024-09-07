@@ -4,7 +4,7 @@ metadata:
   name: elasticsearch
   namespace: elastic-system
 spec:
-  version: 8.14.1
+  version: $ELASTIC_STACK_VERSION
   nodeSets:
   - name: default
     count: 1

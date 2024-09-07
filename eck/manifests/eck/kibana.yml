@@ -4,7 +4,7 @@ metadata:
   name: kibana
   namespace: elastic-system
 spec:
-  version: 8.14.1
+  version: $ELASTIC_STACK_VERSION
   count: 1
   elasticsearchRef:
     name: elasticsearch

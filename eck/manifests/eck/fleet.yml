@@ -4,7 +4,7 @@ metadata:
   name: fleet-server
   namespace: elastic-system
 spec:
-  version: 8.10.2
+  version: $ELASTIC_STACK_VERSION
   kibanaRef:
     name: kibana
   elasticsearchRefs:
@@ -26,7 +26,7 @@ metadata:
   name: elastic-agent
   namespace: elastic-system
 spec:
-  version: 8.14.1
+  version: $ELASTIC_STACK_VERSION
   kibanaRef:
     name: kibana
   fleetServerRef:
