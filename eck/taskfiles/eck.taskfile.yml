@@ -41,18 +41,28 @@ tasks:
   elastic:up:
     cmds:
       # - kubectl apply -k {{.MANIFESTS_DIR}}
-      - kustomize build {{.MANIFESTS_DIR}} | envsubst | kubectl apply --wait -f - 
+      - kustomize build {{.MANIFESTS_DIR}} | envsubst | kubectl apply -f - 
       - sleep 60 # wait for secret to be created
       - task: elastic:credentials
       # - task: elastic:test  # manual port forward 9200 first
+    requires:
+      vars:
+        - MANIFESTS_DIR
 
   elastic:down:
     cmds:
-      - kubectl delete -k {{.MANIFESTS_DIR}}}
+      - kustomize build {{.MANIFESTS_DIR}} | envsubst | kubectl delete -f - 
+    requires:
+      vars:
+        - MANIFESTS_DIR
       
   elastic:logs:
     cmds:
       - kubectl logs -n {{.ELASTIC_NAMESPACE}} sts/{{.HELM_RELEASE}}
+    requires:
+      vars:
+        - HELM_RELEASE
+        - ELASTIC_NAMESPACE
 
   elastic:credentials:
     cmds:
@@ -60,6 +70,10 @@ tasks:
     vars:
       PASSWORD:
         sh: kubectl -n {{.ELASTIC_NAMESPACE}} get secret elasticsearch-es-elastic-user -o jsonpath="{.data.elastic }" | base64 -d
+    requires:
+      vars:
+        - ELASTIC_NAMESPACE
+        - CREDENTIALS_FILE
 
 
   # Requires port forwarding of elastic port 9200
@@ -69,13 +83,22 @@ tasks:
     vars:
       PASSWORD:
         sh: cat {{.CREDENTIALS_FILE}}
+    requires:
+      vars:
+        - CREDENTIALS_FILE
 
   elastic:pf:
     cmds:
       - kubectl port-forward -n {{.ELASTIC_NAMESPACE}} svc/kibana-kb-http 9200:9200
+    requires:
+      vars:
+        - ELASTIC_NAMESPACE
 
   kibana:pf:
     cmds:
       - kubectl port-forward -n {{.ELASTIC_NAMESPACE}} svc/kibana-kb-http 5601:5601
+    requires:
+      vars:
+        - ELASTIC_NAMESPACE
 
   # sample dataset from https://github.com/iuliaferoli/harry-potter-search/blob/main/0.5.%20%20Importing%20Data.md
