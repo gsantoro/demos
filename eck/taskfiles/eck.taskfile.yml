@@ -89,7 +89,7 @@ tasks:
 
   elastic:pf:
     cmds:
-      - kubectl port-forward -n {{.ELASTIC_NAMESPACE}} svc/kibana-kb-http 9200:9200
+      - kubectl port-forward -n {{.ELASTIC_NAMESPACE}} svc/elasticsearch-es-http 9200:9200
     requires:
       vars:
         - ELASTIC_NAMESPACE
