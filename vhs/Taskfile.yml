@@ -1,0 +1,14 @@
+# https://taskfile.dev
+
+version: '3'
+
+includes:
+  nix: taskfiles/nix.taskfile.yml
+  devenv: taskfiles/devenv.taskfile.yml
+  vhs: taskfiles/vhs.taskfile.yml
+
+tasks:
+  default:
+    cmds:
+      - echo "{{.GREETING}}"
+    silent: true

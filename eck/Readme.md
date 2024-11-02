@@ -8,16 +8,22 @@
 
 
 ## Run
+Move into the ECK folder to load all the required environment variables
+
+```bash
+cd envs/eck
+```
+
 Run the default command to create the ECK cluster
 
-```
+```bash
 task
 ```
 
 Once the cluster is up and running (this might take a couple of minutes),
 you can forward the port of Kibana service with the following command
 
-```
+```bash
 task eck:kibana:pf
 ```
 
@@ -35,6 +41,6 @@ You can find the password at ./envs/eck/data/es.credentials.json
 ## More info
 For more commands
 
-```
+```bash
 task --list-all
 ```

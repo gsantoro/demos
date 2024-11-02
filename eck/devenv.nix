@@ -9,5 +9,6 @@
     pkgs.k3d
     pkgs.kubectl
     pkgs.kustomize
+    pkgs.envsubst
   ];
 }

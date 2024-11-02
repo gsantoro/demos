@@ -8,6 +8,10 @@ tasks:
     desc: Add repo={{.HELM_REPO_NAME}}
     cmds:
       - helm repo add {{.HELM_REPO_NAME}} {{.HELM_REPO_URL}}
+    requires:
+      vars:
+        - HELM_REPO_NAME
+        - HELM_REPO_URL
 
   repo:update:
     desc: Update repo
@@ -17,10 +21,17 @@ tasks:
   chart-values:
     cmds:
       - helm show values {{.HELM_CHART}}
+    requires:
+      vars:
+        - HELM_CHART
 
   release-values:
     cmds:
       - helm get values {{.HELM_RELEASE}} --namespace {{.HELM_NAMESPACE}} 
+    requires:
+      vars:
+        - HELM_RELEASE
+        - HELM_NAMESPACE
 
   # Note: t helm:search -- mysql
   search:
@@ -32,16 +43,39 @@ tasks:
     desc: Install a chart by name={{.HELM_CHART}} and release_name={{.HELM_RELEASE}}
     cmds:
       - helm install {{.HELM_RELEASE}} {{.HELM_CHART}} --namespace {{.HELM_NAMESPACE}} {{.HELM_PARAMS}}
+    requires: 
+      vars:
+        - HELM_RELEASE
+        - HELM_CHART
+        - HELM_NAMESPACE
+        - HELM_PARAMS
+
+  install:dry-run:
+    desc: Install a chart by name={{.HELM_CHART}} and release_name={{.HELM_RELEASE}}
+    cmds:
+      - helm install {{.HELM_RELEASE}} {{.HELM_CHART}} --dry-run --debug --namespace {{.HELM_NAMESPACE}} {{.HELM_PARAMS}}
+    requires: 
+      vars:
+        - HELM_RELEASE
+        - HELM_CHART
+        - HELM_NAMESPACE
+        - HELM_PARAMS
 
   uninstall:
     desc: |
       Uninstall a release by name: {{.HELM_RELEASE}}
     cmds:
       - helm uninstall {{.HELM_RELEASE}} --namespace {{.HELM_NAMESPACE}} 
+    requires:
+      vars:
+        - HELM_RELEASE
+        - HELM_NAMESPACE
 
   # custom tasks
   up:
     cmds:
       - task: repo:add
       - task: repo:update
+      - task: install:dry-run
+      - gum confirm "Do you want to install the release?"
       - task: install

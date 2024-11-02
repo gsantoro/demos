@@ -1,0 +1,71 @@
+version: "3"
+
+tasks:
+  install:backup:
+    cmds:
+      - nix-env -iA cachix -f https://cachix.org/api/v1/install
+      - task: trust-user
+      - cachix use devenv
+      - nix-env -if https://github.com/cachix/devenv/tarball/latest
+    vars:
+      WHOAMI:
+        sh: whoami
+
+  # Note: suggested installation method. it didn't work on 2024-09-23. I used `t devenv:install:backup` instead
+  install:
+    cmds:
+      - task: trust-user
+      # - sudo launchctl kickstart -k system/org.nixos.nix-daemon
+
+      # - gum confirm "Kill nix-daemon process manually and then proceed" || true
+      - nix profile install --accept-flake-config nixpkgs#devenv {{.EXTRA_PARAMS}}
+    vars:
+      EXTRA_PARAMS: --extra-experimental-features flakes --extra-experimental-features nix-command
+
+  list:
+    cmds:
+      - nix profile list {{.EXTRA_PARAMS}}
+    vars:
+      EXTRA_PARAMS: --extra-experimental-features flakes --extra-experimental-features nix-command
+
+  uninstall:
+    cmds:
+      - nix profile remove devenv {{.EXTRA_PARAMS}}
+    vars:
+      EXTRA_PARAMS: --extra-experimental-features flakes --extra-experimental-features nix-command
+
+  backup:
+    cmds:
+      - mkdir -p backup
+      - mv .direnv backup
+      
+      - mv devenv.* backup
+      - mv .devenv backup
+      - mv .devenv.flake.nix backup
+
+      - mv .venv backup
+
+      - mv .envrc backup
+    ignore_error: true
+
+
+  trust-user:
+    cmds:
+      - echo "build-users-group = nixbld" | sudo tee /etc/nix/nix.conf
+      - echo "trusted-users = root {{.WHOAMI}}" | sudo tee -a /etc/nix/nix.conf
+    vars:
+      WHOAMI:
+        sh: whoami
+
+  init:
+    cmds:
+      - devenv init
+
+  update:
+    cmds:
+      - devenv update
+
+  # Note: t devenv:search -- gofmt
+  search:
+    cmds:
+      - devenv search {{.CLI_ARGS}}
