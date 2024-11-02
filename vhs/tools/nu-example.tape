@@ -1,6 +1,3 @@
-# Where should we write the GIF?
-Output tools/demo.gif
-
 # Set Shell zsh
 Set Shell nu
 
@@ -14,12 +11,21 @@ Set BorderRadius 10
 
 # Set up a 1200x600 terminal with 46px font.
 # Set FontFamily "Monoflow"
-Set FontSize 20
+Set FontSize 15
 Set Width 1200
-Set Height 600
+Set Height 627
+
+# Where should we write the GIF?
+Output tools/nu-example.gif
+
+Hide
+Type "cd ~ | clear"
+Enter
+Sleep 200ms
+Show
 
 # Type a command in the terminal.
-Type "echo 'Welcome to VHS!'"
+Type "ls | where size > 4kb"
 
 # Pause for dramatic effect...
 Sleep 500ms
@@ -28,4 +34,4 @@ Sleep 500ms
 Enter
 
 # Admire the output for a bit.
-Sleep 5s
+Sleep 2s
