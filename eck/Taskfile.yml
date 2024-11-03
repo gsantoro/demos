@@ -4,6 +4,7 @@ version: '3'
 
 includes:
   eck: ./taskfiles/eck.taskfile.yml
+  nu-eck: ./taskfiles/nu.eck.taskfile.yml
 
 tasks:
   default:
