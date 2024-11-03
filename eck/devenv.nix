@@ -10,5 +10,7 @@
     pkgs.kubectl
     pkgs.kustomize
     pkgs.envsubst
+    pkgs.gum
+    pkgs.k9s
   ];
 }
