@@ -6,6 +6,7 @@ version: '3'
 includes:
   devenv: taskfiles/devenv.taskfile.yml
   nix: taskfiles/nix.taskfile.yml
+  cookiecutter: taskfiles/cookiecutter.taskfile.yml
 
 tasks:
   default:

@@ -1,0 +1,37 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  PROJECT_TEMPLATE_LOCATIONS: gh:gsantoro/project-template ~/workspace/project-template
+
+tasks:
+  # Note:
+  # Utility private functions
+  __choose_output_folder:
+    cmds:
+      - gum choose "Current folder" "Subfolder" | xargs -I {} sh -c 'if [ "{}" = "Subfolder" ]; then gum file --height=5 --directory ..; else echo ".."; fi'
+
+  __choose_project_template:
+    cmds:
+      - gum choose --header="Choose a project template location" {{.PROJECT_TEMPLATE_LOCATIONS}}
+
+  # Public functions
+  init:
+    cmds:
+      - cookiecutter init {{.PROJECT_TEMPLATE}} --output-dir {{.OUTPUT_DIR}}
+    vars:
+      PROJECT_TEMPLATE: 
+        sh: task cookiecutter:__choose_project_template
+      OUTPUT_DIR:
+        sh: task cookiecutter:__choose_output_folder
+
+  replay:
+    cmds:
+      - cookiecutter --replay --overwrite-if-exists {{.PROJECT_TEMPLATE}} --output-dir {{.OUTPUT_DIR}}
+    vars:
+      PROJECT_TEMPLATE: 
+        sh: task cookiecutter:__choose_project_template
+      OUTPUT_DIR:
+        sh: task cookiecutter:__choose_output_folder
+
