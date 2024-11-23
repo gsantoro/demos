@@ -1,5 +1,10 @@
 version: "3"
 
+includes:
+  nix: 
+    taskfile: ./nix.taskfile.yml
+    internal: true
+
 tasks:
   install:backup:
     cmds:
@@ -13,6 +18,8 @@ tasks:
 
   # Note: suggested installation method. it didn't work on 2024-09-23. I used `t devenv:install:backup` instead
   install:
+    deps:
+      - nix:install
     cmds:
       - task: trust-user
       # - sudo launchctl kickstart -k system/org.nixos.nix-daemon

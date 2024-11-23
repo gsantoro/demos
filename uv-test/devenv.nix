@@ -4,8 +4,13 @@
   # https://devenv.sh/packages/
   packages = [ 
     pkgs.git
+
+    
+
+    # tools
     pkgs.gum
     pkgs.cookiecutter
+    pkgs.go-task
   ];
 
   

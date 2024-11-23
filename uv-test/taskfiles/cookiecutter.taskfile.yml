@@ -19,7 +19,7 @@ tasks:
   # Public functions
   init:
     cmds:
-      - cookiecutter init {{.PROJECT_TEMPLATE}} --output-dir {{.OUTPUT_DIR}}
+      - cookiecutter {{.PROJECT_TEMPLATE}} --output-dir {{.OUTPUT_DIR}}
     vars:
       PROJECT_TEMPLATE: 
         sh: task cookiecutter:__choose_project_template
