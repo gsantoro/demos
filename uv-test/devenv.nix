@@ -6,13 +6,6 @@
     pkgs.git
 
     
-    # k8s
-    pkgs.kubectl
-    pkgs.kubernetes-helm
-    pkgs.k3d  
-    pkgs.dive
-    pkgs.trivy
-    
 
     # tools
     pkgs.gum

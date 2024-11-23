@@ -5,7 +5,7 @@
         "author_name": "gsantoro",
         "python_enabled": "y",
         "python_version": "3.12",
-        "k8s_enabled": "y",
+        "k8s_enabled": "n",
         "_copy_without_render": [
             "tasksfiles/*"
         ],
@@ -20,6 +20,6 @@
         "author_name": "gsantoro",
         "python_enabled": "y",
         "python_version": "3.12",
-        "k8s_enabled": "y"
+        "k8s_enabled": "n"
     }
 }
