@@ -1,0 +1,25 @@
+{
+    "cookiecutter": {
+        "project_name": "uv-test",
+        "project_slug": "uv-test",
+        "author_name": "gsantoro",
+        "python_enabled": "y",
+        "python_version": "3.12",
+        "k8s_enabled": "y",
+        "_copy_without_render": [
+            "tasksfiles/*"
+        ],
+        "_template": "/home/gsantoro/workspace/project-template",
+        "_output_dir": "/home/gsantoro/workspace/demos",
+        "_repo_dir": "/home/gsantoro/workspace/project-template",
+        "_checkout": null
+    },
+    "_cookiecutter": {
+        "project_name": "uv-test",
+        "project_slug": "uv-test",
+        "author_name": "gsantoro",
+        "python_enabled": "y",
+        "python_version": "3.12",
+        "k8s_enabled": "y"
+    }
+}

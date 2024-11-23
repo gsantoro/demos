@@ -11,6 +11,10 @@ includes:
   cookiecutter: taskfiles/cookiecutter.taskfile.yml
 
   
+  k8s: taskfiles/k8s.taskfile.yml
+  k8s-k3d: taskfiles/k8s.k3d.taskfile.yml
+  
+  
 tasks:
   default:
     cmds:

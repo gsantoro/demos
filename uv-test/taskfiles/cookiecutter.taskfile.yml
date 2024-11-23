@@ -28,7 +28,7 @@ tasks:
 
   replay:
     cmds:
-      - cookiecutter --replay --overwrite-if-exists {{.PROJECT_TEMPLATE}} --output-dir {{.OUTPUT_DIR}}
+      - cookiecutter --replay --replay-file cookiecutter_replay.json --overwrite-if-exists {{.PROJECT_TEMPLATE}} --output-dir {{.OUTPUT_DIR}}
     vars:
       PROJECT_TEMPLATE: 
         sh: task cookiecutter:__choose_project_template
