@@ -1,0 +1,71 @@
+version: '3'
+
+vars:
+  NIX_EXTRA_FLAGS: --extra-experimental-features nix-command --extra-experimental-features flakes
+
+tasks:
+  install:
+    cmds:
+      - sh <(curl -L https://nixos.org/nix/install)
+
+
+  # Note:
+  # if you update you mac, Nix command won't be available anymore. Follow these steps to install it again
+  # 1. run `task nix:update`
+  # 2. if the installation fails with `nix-env is incompatible with profile. use nix-profile instead.`, it's ok. everything still works. just exist the shell and reopen another one
+  # 3. close the current shell and reopen it again. 
+  #
+  # If nix command is not found, completely remove Nix with instructions at https://nixos.org/manual/nix/stable/installation/uninstall.html#macos 
+  # and restart from step 1 of this list of commands
+  #
+  # If it fails with 
+  # It seems the build group nixbld already exists, but with the UID 30000. ...
+  # You can export NIX_BUILD_GROUP_ID=30000 and re-run.
+  #
+  # Note:
+  # You can't use in this task anything provided by Nix since Nix is not installed
+  update:
+    cmds:
+      - task: before-backup
+      - read -p "[Manual step] Remove any reference to Nix from files under data/tmp/nix.backup, then press enter to continue"
+      - task: after-backup
+      - task: install
+
+
+  restart:
+    cmds:
+      - sudo launchctl stop -k system/org.nixos.nix-daemon
+      - sudo launchctl start -k system/org.nixos.nix-daemon
+
+  before-backup:
+    internal: true
+    cmds: 
+      - rm -rf data/tmp/nix.backup
+      - mkdir -p data/tmp/nix.backup
+      - cp /etc/bashrc data/tmp/nix.backup/bashrc.backup-before-nix
+      - cp /etc/bash.bashrc data/tmp/nix.backup/bash.bashrc.backup-before-nix
+      - cp /etc/zshrc data/tmp/nix.backup/zshrc.backup-before-nix
+      - sudo rm /etc/bashrc.backup-before-nix
+      - sudo rm /etc/bash.bashrc.backup-before-nix
+      - sudo rm /etc/zshrc.backup-before-nix
+    ignore_error: true
+
+  after-backup:
+    internal: true
+    cmds: 
+      - sudo cp data/tmp/nix.backup/bashrc.backup-before-nix /etc/bashrc 
+      - sudo cp data/tmp/nix.backup/zshrc.backup-before-nix /etc/zshrc 
+      - rm -rf data/tmp/nix.backup
+
+  cleanup:
+    cmds:
+      - |
+        gum confirm "Are you sure that you want to remove the Nix profile {{.NIX_PROFILE_TO_REMOVE}}?" && \
+        nix profile {{.NIX_EXTRA_FLAGS}} remove {{.NIX_PROFILE_TO_REMOVE}}
+    vars:
+      NIX_PROFILE_TO_REMOVE:
+        sh: nix profile {{.NIX_EXTRA_FLAGS}} list --json | jq -r '.elements[].storePaths[]' | gum filter --placeholder "choose a nix profile to delete" --limit 1
+
+  list:
+    cmds:
+      - nix profile {{.NIX_EXTRA_FLAGS}} list
