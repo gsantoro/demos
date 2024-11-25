@@ -1,8 +1,26 @@
-# https://taskfile.dev
-
 version: '3'
 
 tasks:
   dev:
     cmds:
-      - cd dev && direnv allow && echo $ENVIRONMENT
+      - |
+        cd dev && \
+        direnv allow && \
+        eval "$(direnv export bash)" && \
+        echo "Environment is: $ENVIRONMENT"
+    silent: true
+  
+  prod:
+    cmds:
+      - |
+        cd prod && \
+        direnv allow && \
+        eval "$(direnv export bash)" && \
+        echo "Environment is: $ENVIRONMENT"
+    silent: true
+
+  check-env:
+    cmds:
+      - |
+        echo "Current ENVIRONMENT is: $ENVIRONMENT"
+    silent: true
