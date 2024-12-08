@@ -1,0 +1,51 @@
+version: '3'
+
+# direnv: setup https://direnv.net/docs/hook.html
+
+tasks:
+  session: 
+    cmds:
+      - |
+        curl -X POST https://bsky.social/xrpc/com.atproto.server.createSession \
+        -H "Content-Type: application/json" \
+        -d '{"identifier": "{{.BLUESKY_HANDLE}}", "password": "{{.BLUESKY_PASSWORD}}"}' \
+        > data/bluesky.session.json
+    interactive: true
+    vars:
+      BLUESKY_HANDLE:
+        sh: eval $(op signin) && op read "$BLUESKY_HANDLE"
+      BLUESKY_PASSWORD:
+        sh: eval $(op signin) && op read "$BLUESKY_PASSWORD"
+    requires:
+      vars:
+        - BLUESKY_HANDLE
+        - BLUESKY_PASSWORD
+
+  post:
+    cmds: 
+      - |
+        curl -X POST https://bsky.social/xrpc/com.atproto.repo.createRecord \
+        -H "Authorization: Bearer {{.BLUESKY_ACCESS_JWT}}" \
+        -H "Content-Type: application/json" \
+        -d '{
+          "repo": "{{.BLUESKY_HANDLE}}",
+          "collection": "app.bsky.feed.post",
+          "record": {
+            "text": "Boost Your DevOps Workflow with Nushell & Jc! 
+             Discover two powerful command-line tools that can transform your workflow: Nushell and Jc.
+             Read the full article: https://cloudnativeengineer.substack.com/p/powerful-command-line-tools-for-devops",
+            "createdAt": "{{.TIMESTAMP}}"
+          }
+        }' > data/bluesky.post.json
+    interactive: true
+    vars:
+      BLUESKY_HANDLE:
+        sh: eval $(op signin) && op read "$BLUESKY_HANDLE"
+      BLUESKY_ACCESS_JWT:
+        sh: cat data/bluesky.session.json | jq -r '.accessJwt'
+      TIMESTAMP:
+        sh: date -u +"%Y-%m-%dT%H:%M:%SZ"
+    requires:
+      vars:
+        - BLUESKY_HANDLE
+        - BLUESKY_PASSWORD

@@ -1,0 +1,20 @@
+# https://taskfile.dev
+
+version: '3'
+
+
+includes:
+  nix: taskfiles/nix.taskfile.yml
+  devenv: taskfiles/devenv.taskfile.yml
+  direnv: taskfiles/direnv.taskfile.yml  
+
+  cookiecutter: taskfiles/cookiecutter.taskfile.yml
+
+  bluesky: taskfiles/bluesky.taskfile.yml
+  
+  
+tasks:
+  default:
+    cmds:
+      - task --list-all
+    silent: true
