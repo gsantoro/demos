@@ -1,0 +1,12 @@
+version: '3'
+
+# direnv: setup https://direnv.net/docs/hook.html
+
+tasks:
+  install: 
+    cmds:
+      - brew install direnv
+
+  reload:
+    cmds: 
+      - direnv allow && direnv reload

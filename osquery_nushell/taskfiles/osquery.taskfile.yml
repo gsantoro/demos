@@ -1,0 +1,23 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  PROJECT_TEMPLATE_LOCATIONS: gh:gsantoro/project-template ~/workspace/project-template
+
+tasks:
+  query:online:
+    cmds:
+      - osqueryi --json < {{.QUERY_FILE}} | nu --stdin -c "from json | table"
+    vars:
+      QUERY_FILE: 
+        sh: ls queries/*.sql | fzf | gum choose --header="Choose a query file"
+
+  query:
+    cmds:
+      - osqueryi --json < {{.QUERY_FILE}} > data/{{.OUTPUT_FILE}}.json
+    vars:
+      QUERY_FILE: 
+        sh: ls queries/*.sql | fzf | gum choose --header="Choose a query file"
+      OUTPUT_FILE: 
+        sh: basename -s .sql {{.QUERY_FILE}}
