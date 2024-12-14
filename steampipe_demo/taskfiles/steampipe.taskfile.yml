@@ -1,0 +1,21 @@
+# https://taskfile.dev
+
+version: '3'
+
+tasks:
+  deps:
+    - down
+  up:
+    cmds:
+      - task: plugins
+      - |
+        steampipe service start --show-password | grep "Password: " | awk '{print $2}' | xargs -I {} sh -c 'echo "STEAMPIPE_DB_PASS={}" > envs/steampipe/.env.pass'
+
+  down:
+    cmds:
+      - rm -f envs/steampipe/.env.pass
+      - steampipe service stop --force
+
+  plugins:
+    cmds:
+      - steampipe plugin install hackernews

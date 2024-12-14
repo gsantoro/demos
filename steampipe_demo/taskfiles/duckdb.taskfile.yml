@@ -1,0 +1,20 @@
+# https://taskfile.dev
+
+version: '3'
+
+tasks:
+  config:
+    cmds:
+      - |
+        cat << 'EOF' > data/tmp/steampipe_duckdb.sql 
+        ATTACH 'dbname=steampipe user=steampipe password={{.STEAMPIPE_DB_PASS}} host=127.0.0.1 port=9193' AS steampipe (TYPE postgres);
+        EOF
+    requires:
+      vars:
+        - STEAMPIPE_DB_PASS
+
+  query:
+    deps:
+      - config
+    cmds:
+      - duckdb -init data/tmp/steampipe_duckdb.sql
