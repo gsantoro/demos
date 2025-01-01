@@ -1,0 +1,26 @@
+{
+  "cookiecutter": {
+    "project_name": "substack_automation",
+    "project_slug": "substack_automation",
+    "author": "gsantoro",
+    "python_enabled": "y",
+    "python_version": "3.12",
+    "k8s_enabled": "no",
+    "_copy_without_render": [
+      "taskfiles/*.yml",
+      "taskfiles/*.yaml"
+    ],
+    "_template": "gh:gsantoro/project-template",
+    "_output_dir": "/home/gsantoro/workspace/demos",
+    "_repo_dir": "/home/gsantoro/.cookiecutters/project-template",
+    "_checkout": null
+  },
+  "_cookiecutter": {
+    "project_name": "Project template",
+    "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_') }}",
+    "author": "gsantoro",
+    "python_enabled": "y",
+    "python_version": "3.12",
+    "k8s_enabled": "y"
+  }
+}
