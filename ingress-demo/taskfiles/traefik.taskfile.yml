@@ -1,0 +1,36 @@
+# https://taskfile.dev
+
+version: '3'
+
+# Note:
+tasks: 
+  pf:
+    cmds:
+      - kubectl -n kube-system port-forward deployment/traefik {{.TRAEFIK_PORT}}
+    requires:
+      vars:
+        - TRAEFIK_PORT
+
+  dashboard:
+    cmds:
+      - open http://localhost:{{.TRAEFIK_PORT}}/dashboard/
+    requires:
+      vars:
+        - TRAEFIK_PORT
+
+  crds:
+    cmds:
+      - kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/standard-install.yaml --validate=false
+  
+  gateway:
+    deps:
+      - crds
+    cmds:
+      - kubectl apply -f manifests/traefik/cm.yaml
+      - kubectl patch deployment traefik -n kube-system --patch "$(cat manifests/traefik/deployment-patch.yaml)"    
+
+  up:
+    cmds:
+      - task: crds
+      - task: traefik:dashboard
+      - task: traefik:pf

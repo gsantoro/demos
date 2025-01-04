@@ -5,6 +5,7 @@ version: '3'
 
 includes:
   k8s-k3d: taskfiles/k8s.k3d.taskfile.yml
+  traefik: taskfiles/traefik.taskfile.yml
 
   my-app: taskfiles/my-app.taskfile.yml
   

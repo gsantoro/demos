@@ -1,0 +1,14 @@
+experimental:
+  kubernetesGateway: true
+
+providers:
+  kubernetesCRD:
+    enabled: true
+  kubernetesGateway:
+    enabled: true
+
+# api:
+#   dashboard: true
+#   insecure: true
+# log:
+#   level: DEBUG  # Temporarily increase log level for debugging

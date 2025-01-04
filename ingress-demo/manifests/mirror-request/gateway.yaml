@@ -1,0 +1,57 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: traefik
+spec:
+  controllerName: traefik.io/gateway-controller
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: my-gateway
+  namespace: default
+spec:
+  gatewayClassName: traefik
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: mirror-route
+  namespace: default
+spec:
+  parentRefs:
+    - name: my-gateway
+  hostnames:
+  - mirror.example
+  rules:
+  - backendRefs:
+    - name: my-app-primary
+      port: 80
+    filters:
+    - type: RequestMirror
+      requestMirror:
+        backendRef:
+          name: my-app-mirror
+          port: 80
+  # rules:
+  #   - matches:
+  #       - path:
+  #           type: PathPrefix
+  #           value: /api
+  #     backendRefs:
+  #       # Primary service that receives all traffic
+  #       - name: my-app-primary
+  #         port: 80
+  #         weight: 1
+  #       # Mirror service that receives a copy of the traffic
+  #       - name: my-app-mirror
+  #         port: 80
+  #         weight: 0  # Weight 0 indicates this is a mirror
+  #         filters:
+  #           - type: RequestMirror
+  #             requestMirror:
+  #               percent: 50  # Mirror 50% of the traffic

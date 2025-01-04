@@ -29,21 +29,3 @@ tasks:
       vars:
         - K3D_CLUSTER_NAME
 
-  traefik:pf:
-    cmds:
-      - kubectl -n kube-system port-forward deployment/traefik {{.TRAEFIK_PORT}}
-    requires:
-      vars:
-        - TRAEFIK_PORT
-
-  traefik:dashboard:
-    cmds:
-      - open http://localhost:{{.TRAEFIK_PORT}}/dashboard/
-    requires:
-      vars:
-        - TRAEFIK_PORT
-
-  traefik:
-    cmds:
-      - task: traefik:dashboard
-      - task: traefik:pf

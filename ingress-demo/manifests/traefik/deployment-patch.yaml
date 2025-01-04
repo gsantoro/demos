@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  template:
+    spec:
+      containers:
+        - name: traefik
+          args:
+            - --configfile=/config/traefik.yaml
+          volumeMounts:
+            - name: traefik-config
+              mountPath: /config
+      volumes:
+        - name: traefik-config
+          configMap:
+            name: traefik-config
