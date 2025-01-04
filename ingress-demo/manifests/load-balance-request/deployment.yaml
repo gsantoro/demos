@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: my-app
-          image: ealen/echo-server:latest
+          image: traefik/whoami:latest
           ports:
             - containerPort: 80
           env:

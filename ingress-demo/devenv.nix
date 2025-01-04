@@ -9,11 +9,9 @@
     pkgs.kubectl
     pkgs.k3d  
     pkgs.k9s
-    pkgs.kubernetes-helm
     
     # tools
     pkgs.gum
     pkgs.go-task
-    pkgs.jq
   ];
 }

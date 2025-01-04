@@ -10,7 +10,7 @@ tasks:
     deps: 
       - delete
     cmds:
-      - k3d cluster create {{.K3D_CLUSTER_NAME}} --image rancher/k3s:{{.K3D_CLUSTER_VERSION}} --k3s-arg "--disable=traefik@server:*"
+      - k3d cluster create {{.K3D_CLUSTER_NAME}} --image rancher/k3s:{{.K3D_CLUSTER_VERSION}} -p "8080:80@loadbalancer"
       - kubectl wait --for=condition=Ready node --all --timeout=300s
     requires:
       vars:

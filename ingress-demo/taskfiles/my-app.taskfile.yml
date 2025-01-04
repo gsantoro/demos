@@ -8,17 +8,11 @@ includes:
     dir: ".." # NOTE: when including another taskfile you need to go up one dir to point to root
     internal: true
 
-  traefik:
-    taskfile: ./traefik.taskfile.yml
-    dir: ".." # NOTE: when including another taskfile you need to go up one dir to point to root
-    internal: true
-
 # Note:
 tasks: 
   up: 
     cmds:
       - task: k8s:create
-      - task: traefik:gateway
 
   down: 
     cmds:
@@ -35,17 +29,4 @@ tasks:
   load-balance-request:client:
     cmds:
       - |
-        curl -H "Host: my-app.local" http://localhost:8080 | jq .
-
-  mirror-request:
-    cmds:
-      - kubectl apply -f manifests/mirror-request --validate=false
-
-  mirror-request:down:
-    cmds:
-      - kubectl delete -f manifests/mirror-request
-
-  mirror-request:client:
-    cmds:
-      - |
-        curl -H "Host: mirror.example" http://localhost:8000 | jq .
+        curl http://localhost:8080

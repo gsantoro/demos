@@ -31,8 +31,8 @@ This will also port forward the Traefik port for the gateway.
 in a separate shell, run one of the scenarios
 
 ```bash
-task my-app:mirror-request
-task my-app:mirror-request:client
+task my-app:load-balance-request
+task my-app:load-balance-request:client
 ```
 
 You might need to retry the client if the service is not up and running yet
