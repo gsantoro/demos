@@ -1,0 +1,61 @@
+version: "3"
+
+# K8S_IMAGE_PREFIX: "kindest/node:" # prefix to identify kind cluster
+
+tasks:
+  kube-state-metrics-create:
+    summary: |
+      Install kube-state-metrics
+    cmds:
+      - kubectl apply -k https://github.com/kubernetes/kube-state-metrics?ref={{.KUBE_STATE_METRICS_VERSION}}
+
+  kube-state-metrics-delete:
+    summary: |
+      Remove kube-state-metrics
+    cmds:
+      - kubectl delete --ignore-not-found=true -k https://github.com/kubernetes/kube-state-metrics?ref={{.KUBE_STATE_METRICS_VERSION}}
+
+  taint-node1:
+    cmds:
+      - kubectl taint nodes multi-{{.KUBERNETES_VERSION}}-worker debugger=ok:NoSchedule
+    vars:
+      KUBERNETES_VERSION:
+        sh: echo $KUBERNETES_VERSION
+
+  taint-node1-delete:
+    cmds:
+      - kubectl taint nodes multi-{{.KUBERNETES_VERSION}}-worker debugger=ok:NoSchedule-
+    vars:
+      KUBERNETES_VERSION:
+        sh: echo $KUBERNETES_VERSION
+
+  label-node1:
+    cmds:
+      - kubectl label nodes multi-{{.KUBERNETES_VERSION}}-worker debugger=ok
+    vars:
+      KUBERNETES_VERSION:
+        sh: echo $KUBERNETES_VERSION
+
+  label-node1-delete:
+    cmds:
+      - kubectl label nodes multi-{{.KUBERNETES_VERSION}}-worker debugger-
+    vars:
+      KUBERNETES_VERSION:
+        sh: echo $KUBERNETES_VERSION
+
+  # Info: https://github.com/kvaps/kubectl-node-shell/blob/master/README.md
+  node-shell:
+    cmds:
+      - kubectl node-shell {{.NODE_NAME}}
+    vars:
+      NODE_NAME:
+        sh: |
+          kubectl get nodes -o jsonpath='{.items[*].metadata.name}' \
+          | tr ' ' '\n' \
+          | grep "worker" \
+          | head -n 1
+
+  network-delete:
+    cmds:
+      - docker network rm {{.DOCKER_NETWORK_NAME}}
+    ignore_error: true

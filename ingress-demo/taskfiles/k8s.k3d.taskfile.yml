@@ -1,0 +1,57 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  TRAEFIK_PORT: 9000
+
+tasks: 
+  # Note: get k3s versions from https://hub.docker.com/r/rancher/k3s/tags
+  create: 
+    summary: |
+      Create a single node k8s cluster
+    deps: 
+      - delete
+    cmds:
+      - k3d cluster create {{.K3D_CLUSTER_NAME}} --image rancher/k3s:{{.K3D_CLUSTER_VERSION}} --agents {{.K3D_AGENTS}} --agents-memory {{.K3D_AGENTS_MEMORY}}
+# "8081:80@loadbalancer"
+    requires:
+      vars:
+        - K3D_CLUSTER_NAME
+        - K3D_CLUSTER_VERSION
+        - K3D_AGENTS
+        - K3D_AGENTS_MEMORY
+
+  delete:
+    summary: |
+      Delete a multi node k8s cluster
+    cmds: 
+      - k3d cluster delete {{.K3D_CLUSTER_NAME}}
+    requires:
+      vars:
+        - K3D_CLUSTER_NAME
+
+  load:
+    cmds:
+      - k3d image load {{.DOCKER_REPOSITORY}}/{{.DOCKER_USER}}/{{.DOCKER_IMAGE}}:{{.DOCKER_TAG}} -c {{.K3D_CLUSTER_NAME}}
+    requires:
+      vars:
+        - DOCKER_REPOSITORY
+        - DOCKER_USER
+        - DOCKER_IMAGE
+        - DOCKER_TAG
+        - K3D_CLUSTER_NAME
+
+  traefik:pf:
+    cmds:
+      - kubectl -n kube-system port-forward deployment/traefik {{.TRAEFIK_PORT}}
+    requires:
+      vars:
+        - TRAEFIK_PORT
+
+  traefik:dashboard:
+    cmds:
+      - open http://localhost:{{.TRAEFIK_PORT}}/dashboard/
+    requires:
+      vars:
+        - TRAEFIK_PORT
