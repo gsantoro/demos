@@ -4,6 +4,8 @@ version: '3'
 
 
 includes:
+  silicon: taskfiles/silicon.taskfile.yml
+
   k8s-k3d: taskfiles/k8s.k3d.taskfile.yml
   traefik: taskfiles/traefik.taskfile.yml
 

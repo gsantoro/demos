@@ -1,0 +1,23 @@
+version: '3'
+
+tasks:
+  process:
+    cmds:
+      - |
+        silicon {{.FILENAME}} \
+        -b '#73a3af' \
+        --shadow-color '#555' \
+        --shadow-blur-radius 30 \
+        --shadow-offset-x 20 \
+        --shadow-offset-y 20 \
+        -l yaml \
+        --window-title '{{.WINDOW_TITLE}}' \
+        --theme "TwoDark" \
+        -o data/imgs/{{.OUTPUT_FILENAME}}.png
+    vars:
+      FILENAME:
+        sh: find . -type f -name '*.yaml' | fzf
+      WINDOW_TITLE:
+        sh: echo {{.FILENAME}} | xargs basename
+      OUTPUT_FILENAME:
+        sh: echo {{.WINDOW_TITLE}} | sed 's/\.yaml//g'

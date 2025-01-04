@@ -15,5 +15,8 @@
     pkgs.gum
     pkgs.go-task
     pkgs.jq
+
+    pkgs.silicon
+    pkgs.fzf
   ];
 }
