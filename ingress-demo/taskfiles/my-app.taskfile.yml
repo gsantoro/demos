@@ -1,0 +1,19 @@
+# https://taskfile.dev
+
+version: '3'
+
+includes:
+  k8s:
+    taskfile: ./k8s.k3d.taskfile.yml
+    dir: ".." # NOTE: when including another taskfile you need to go up one dir to point to root
+    internal: true
+
+# Note:
+tasks: 
+  up: 
+    cmds:
+      - task: k8s:create
+
+  manifests:
+    cmds:
+      - kubectl apply -f manifests

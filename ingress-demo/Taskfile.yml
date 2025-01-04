@@ -4,16 +4,9 @@ version: '3'
 
 
 includes:
-  nix: taskfiles/nix.taskfile.yml
-  devenv: taskfiles/devenv.taskfile.yml
-  direnv: taskfiles/direnv.taskfile.yml  
-
-  cookiecutter: taskfiles/cookiecutter.taskfile.yml
-
-  
-  k8s: taskfiles/k8s.taskfile.yml
   k8s-k3d: taskfiles/k8s.k3d.taskfile.yml
-  
+
+  my-app: taskfiles/my-app.taskfile.yml
   
 tasks:
   default:

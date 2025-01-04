@@ -13,14 +13,12 @@ tasks:
     deps: 
       - delete
     cmds:
-      - k3d cluster create {{.K3D_CLUSTER_NAME}} --image rancher/k3s:{{.K3D_CLUSTER_VERSION}} --agents {{.K3D_AGENTS}} --agents-memory {{.K3D_AGENTS_MEMORY}}
-# "8081:80@loadbalancer"
+      - k3d cluster create {{.K3D_CLUSTER_NAME}} --image rancher/k3s:{{.K3D_CLUSTER_VERSION}} --port "8080:80@loadbalancer"
+      - kubectl wait --for=condition=Ready node --all --timeout=300s
     requires:
       vars:
         - K3D_CLUSTER_NAME
         - K3D_CLUSTER_VERSION
-        - K3D_AGENTS
-        - K3D_AGENTS_MEMORY
 
   delete:
     summary: |
@@ -29,17 +27,6 @@ tasks:
       - k3d cluster delete {{.K3D_CLUSTER_NAME}}
     requires:
       vars:
-        - K3D_CLUSTER_NAME
-
-  load:
-    cmds:
-      - k3d image load {{.DOCKER_REPOSITORY}}/{{.DOCKER_USER}}/{{.DOCKER_IMAGE}}:{{.DOCKER_TAG}} -c {{.K3D_CLUSTER_NAME}}
-    requires:
-      vars:
-        - DOCKER_REPOSITORY
-        - DOCKER_USER
-        - DOCKER_IMAGE
-        - DOCKER_TAG
         - K3D_CLUSTER_NAME
 
   traefik:pf:
@@ -55,3 +42,8 @@ tasks:
     requires:
       vars:
         - TRAEFIK_PORT
+
+  traefik:
+    cmds:
+      - task: traefik:dashboard
+      - task: traefik:pf

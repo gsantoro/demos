@@ -5,19 +5,15 @@
   packages = [ 
     pkgs.git
 
-    
     # k8s
     pkgs.kubectl
-    pkgs.kubernetes-helm
     pkgs.k3d  
-    pkgs.dive
-    pkgs.trivy
+    pkgs.k9s
     
-
     # tools
     pkgs.gum
-    pkgs.cookiecutter
     pkgs.go-task
+    pkgs.jq
   ];
 
   
