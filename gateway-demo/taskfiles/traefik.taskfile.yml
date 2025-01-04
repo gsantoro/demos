@@ -13,7 +13,7 @@ includes:
       HELM_RELEASE: traefik
       HELM_CHART: traefik/traefik
       HELM_NAMESPACE: "traefik"
-      HELM_PARAMS: --create-namespace -f manifests/traefik/values.yaml
+      HELM_PARAMS: --wait --create-namespace -f manifests/traefik/values.yaml
 
 tasks: 
   dashboard:
