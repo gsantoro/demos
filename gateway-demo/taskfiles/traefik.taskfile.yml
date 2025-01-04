@@ -1,0 +1,49 @@
+# https://taskfile.dev
+
+version: '3'
+
+includes:
+  helm:
+    taskfile: ./helm.taskfile.yml
+    dir: ".." # NOTE: when including another taskfile you need to go up one dir to point to root
+    internal: true
+    vars:
+      HELM_REPO_NAME: traefik
+      HELM_REPO_URL: https://traefik.github.io/charts
+      HELM_RELEASE: traefik
+      HELM_CHART: traefik/traefik
+      HELM_NAMESPACE: "traefik"
+      HELM_PARAMS: --create-namespace -f manifests/traefik/values.yaml
+
+tasks: 
+  dashboard:
+    cmds:
+      - task: dashboard:open
+      - task: dashboard:pf
+
+  dashboard:pf:
+    cmds:
+      - kubectl -n traefik port-forward {{.TRAEFIK_POD_NAME}} 8080
+    vars:
+      TRAEFIK_POD_NAME:
+        sh: kubectl get pods -n traefik --selector "app.kubernetes.io/name=traefik" --output=name
+
+  dashboard:open:
+    cmds:
+      - open http://localhost:8080/dashboard/
+ 
+  gateway:
+    cmds:
+      - task: helm:up
+      - task: gateway:pf
+
+  gateway:down:
+    cmds:
+      - task: helm:down
+
+  gateway:pf:
+    cmds:
+      - kubectl -n traefik port-forward {{.TRAEFIK_POD_NAME}} 8000
+    vars:
+      TRAEFIK_POD_NAME:
+        sh: kubectl get pods -n traefik --selector "app.kubernetes.io/name=traefik" --output=name

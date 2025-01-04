@@ -1,0 +1,21 @@
+# experimental:
+#   kubernetesGateway: true
+
+providers:
+  kubernetesCRD:
+    enabled: true
+  kubernetesGateway:
+    enabled: true
+  kubernetesIngress:
+    enabled: true
+
+# Allow the Gateway to expose HTTPRoute from all namespaces
+gateway:
+  namespacePolicy: All
+
+ingressRoute:
+  dashboard:
+    enabled: true
+
+# log:
+#   level: DEBUG  # Temporarily increase log level for debugging

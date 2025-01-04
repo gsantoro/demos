@@ -1,0 +1,28 @@
+# https://taskfile.dev
+
+version: '3'
+
+tasks: 
+  # Note: get k3s versions from https://hub.docker.com/r/rancher/k3s/tags
+  create: 
+    summary: |
+      Create a single node k8s cluster
+    deps: 
+      - delete
+    cmds:
+      - k3d cluster create {{.K3D_CLUSTER_NAME}} --image rancher/k3s:{{.K3D_CLUSTER_VERSION}} --k3s-arg "--disable=traefik@server:*"
+      - kubectl wait --for=condition=Ready node --all --timeout=300s
+    requires:
+      vars:
+        - K3D_CLUSTER_NAME
+        - K3D_CLUSTER_VERSION
+
+  delete:
+    summary: |
+      Delete a multi node k8s cluster
+    cmds: 
+      - k3d cluster delete {{.K3D_CLUSTER_NAME}}
+    requires:
+      vars:
+        - K3D_CLUSTER_NAME
+
