@@ -2,9 +2,6 @@
 
 version: '3'
 
-vars:
-  TRAEFIK_PORT: 9000
-
 tasks: 
   # Note: get k3s versions from https://hub.docker.com/r/rancher/k3s/tags
   create: 
@@ -13,7 +10,7 @@ tasks:
     deps: 
       - delete
     cmds:
-      - k3d cluster create {{.K3D_CLUSTER_NAME}} --image rancher/k3s:{{.K3D_CLUSTER_VERSION}} --port "8080:80@loadbalancer"
+      - k3d cluster create {{.K3D_CLUSTER_NAME}} --image rancher/k3s:{{.K3D_CLUSTER_VERSION}} --k3s-arg "--disable=traefik@server:*"
       - kubectl wait --for=condition=Ready node --all --timeout=300s
     requires:
       vars:

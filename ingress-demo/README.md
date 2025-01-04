@@ -18,3 +18,21 @@ If you have brew installed already, you can install direnv with:
 ```bash
 task direnv:install
 ```
+
+## Getting started
+Setup the cluster with Traefik as Gateway controller
+
+```bash
+task my-app:up
+```
+
+This will also port forward the Traefik port for the gateway.
+
+in a separate shell, run one of the scenarios
+
+```bash
+task my-app:mirror-request
+task my-app:mirror-request:client
+```
+
+You might need to retry the client if the service is not up and running yet
