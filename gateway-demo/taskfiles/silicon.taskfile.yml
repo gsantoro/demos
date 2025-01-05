@@ -3,6 +3,7 @@ version: '3'
 tasks:
   process:
     cmds:
+      - mkdir -p data/imgs/{{.DIRNAME}}
       - |
         silicon {{.FILENAME}} \
         -b '#73a3af' \
@@ -10,14 +11,18 @@ tasks:
         --shadow-blur-radius 30 \
         --shadow-offset-x 20 \
         --shadow-offset-y 20 \
-        -l yaml \
+        -l {{.LANGUAGE}} \
         --window-title '{{.WINDOW_TITLE}}' \
         --theme "TwoDark" \
-        -o data/imgs/{{.OUTPUT_FILENAME}}.png
+        -o data/imgs/{{.DIRNAME}}/{{.OUTPUT_FILENAME}}.png
     vars:
       FILENAME:
-        sh: find . -type f -name '*.yaml' | fzf
+        sh: find . -type f | fzf
       WINDOW_TITLE:
         sh: echo {{.FILENAME}} | xargs basename
+      DIRNAME:
+        sh: echo {{.FILENAME}} | xargs dirname
+      LANGUAGE:
+        sh: gum choose --limit 1 --header "Select language" "yaml" "sql" "go" 
       OUTPUT_FILENAME:
-        sh: echo {{.WINDOW_TITLE}} | sed 's/\.yaml//g'
+        sh: echo {{.WINDOW_TITLE}} | sed 's/\.[^.]*$//'

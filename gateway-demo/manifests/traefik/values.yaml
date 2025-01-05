@@ -4,7 +4,7 @@ providers:
   kubernetesGateway:
     enabled: true
   kubernetesIngress:
-    enabled: true
+    enabled: false
 
 gateway:
   namespacePolicy: All

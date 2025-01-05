@@ -28,11 +28,11 @@ tasks:
     deps:
       - load-balance:down
     cmds:
-      - kubectl apply -f manifests/load-balance --validate=false
+      - kubectl apply -k manifests/load-balance
 
   load-balance:down:
     cmds:
-      - kubectl delete -f manifests/load-balance
+      - kubectl delete --ignore-not-found -k manifests/load-balance
 
   load-balance:client:
     cmds:

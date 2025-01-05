@@ -4,6 +4,7 @@ metadata:
   name: my-app
   labels:
     app: my-app
+  namespace: load-balance
 spec:
   selector:
     app: my-app

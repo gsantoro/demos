@@ -13,4 +13,4 @@ spec:
   - backendRefs:
     - name: my-app
       port: 80
-      namespace: default
+      namespace: load-balance
