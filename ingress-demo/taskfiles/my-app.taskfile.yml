@@ -18,15 +18,33 @@ tasks:
     cmds:
       - task: k8s:delete
 
-  load-balance-request:
+  ingress-load-balance:
+    deps: 
+      - ingress-load-balance:down
     cmds:
-      - kubectl apply -f manifests/load-balance-request
+      - kubectl apply -f manifests/ingress-load-balance
 
-  load-balance-request:down:
+  ingress-load-balance:down:
     cmds:
-      - kubectl delete -f manifests/load-balance-request
+      - kubectl delete --ignore-not-found -f manifests/ingress-load-balance
 
-  load-balance-request:client:
+  ingress-load-balance:client:
     cmds:
       - |
         curl http://localhost:8080
+
+  # does NOT work in Traefik, only on Cloud
+  load-balancer-service:
+    deps: 
+      - load-balancer-service:down
+    cmds:
+      - kubectl apply -f manifests/load-balancer-service
+
+  load-balancer-service:down:
+    cmds:
+      - kubectl delete --ignore-not-found -f manifests/load-balancer-service
+
+  load-balancer-service:client:
+    cmds:
+      - |
+        curl -H "Host: my-app-svc" http://localhost:8080

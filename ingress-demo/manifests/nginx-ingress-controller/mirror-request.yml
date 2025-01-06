@@ -1,0 +1,19 @@
+# NGINX Ingress configuration
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: request-mirror
+  annotations:
+    nginx.ingress.kubernetes.io/mirror-target: "http://echo-b.default.svc.cluster.local:80$request_uri"
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: echo-a
+                port:
+                  number: 80
