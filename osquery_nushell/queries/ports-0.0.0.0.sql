@@ -4,6 +4,5 @@ SELECT DISTINCT p.name,
   l.address
 FROM processes p
   JOIN listening_ports l ON p.pid = l.pid
-WHERE l.address != '::1'
-  AND l.address != '127.0.0.1'
+WHERE l.address = '0.0.0.0'
 ORDER BY l.port;

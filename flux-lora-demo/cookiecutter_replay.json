@@ -1,7 +1,7 @@
 {
   "cookiecutter": {
-    "project_name": "substack_automation",
-    "project_slug": "substack_automation",
+    "project_name": "flux-lora-demo",
+    "project_slug": "flux-lora-demo",
     "author": "gsantoro",
     "python_enabled": "y",
     "python_version": "3.12",

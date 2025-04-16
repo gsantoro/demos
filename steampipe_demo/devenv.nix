@@ -12,6 +12,9 @@
 
     pkgs.steampipe
     pkgs.duckdb
+    pkgs.vhs
+    pkgs.asciinema-agg
+    pkgs.silicon
   ];
 
   

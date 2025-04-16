@@ -7,7 +7,9 @@ tasks:
     cmds:
       - |
         cat << 'EOF' > data/tmp/steampipe_duckdb.sql 
+        INSTALL postgres;
         ATTACH 'dbname=steampipe user=steampipe password={{.STEAMPIPE_DB_PASS}} host=127.0.0.1 port=9193' AS steampipe (TYPE postgres);
+        use steampipe.hackernews;
         EOF
     requires:
       vars:

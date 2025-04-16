@@ -1,4 +1,4 @@
-# Project: substack_automation
+# Project: flux-lora-demo
 
 ## Requirements
 In order to work in the project you need to have:

@@ -1,0 +1,14 @@
+version: '3'
+
+tasks:
+  process:
+    cmds:
+      - vhs {{.VHS_TAPE}} -o {{.VHS_OUTPUT}}
+    vars:
+      VHS_TAPE: 
+        sh: ls data/tmp/*.tape | fzf
+      VHS_OUTPUT:
+        sh: echo {{.VHS_TAPE}} | sed 's/\.tape/\.gif/g'
+
+document.querySelector('button.pencraft')
+document.querySelector('button:has-text("What's on your mind?")')

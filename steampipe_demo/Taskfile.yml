@@ -12,8 +12,11 @@ includes:
   steampipe: taskfiles/steampipe.taskfile.yml
   duckdb: taskfiles/duckdb.taskfile.yml
 
+  vhs: taskfiles/vhs.taskfile.yml 
+  asciinema: taskfiles/asciinema.taskfile.yml
   
-  
+  silicon: taskfiles/silicon.taskfile.yml
+
 tasks:
   default:
     cmds:

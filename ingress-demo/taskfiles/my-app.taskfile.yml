@@ -31,7 +31,7 @@ tasks:
   ingress-load-balance:client:
     cmds:
       - |
-        curl http://localhost:8080
+        curl -H "Host: my-app.example" http://localhost:8080
 
   # does NOT work in Traefik, only on Cloud
   load-balancer-service:

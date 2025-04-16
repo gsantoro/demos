@@ -10,7 +10,7 @@ includes:
 
   cookiecutter: taskfiles/cookiecutter.taskfile.yml
 
-  
+  flux-lora: taskfiles/flux-lora.taskfile.yml 
   
 tasks:
   default:

@@ -1,0 +1,11 @@
+version: '3'
+
+tasks:
+  process:
+    cmds:
+      - agg --theme solarized-dark {{.INPUT}} {{.OUTPUT}}
+    vars:
+      INPUT: 
+        sh: ls data/tmp/*.cast | fzf
+      OUTPUT:
+        sh: echo {{.INPUT}} | sed 's/\.cast/\.gif/g'

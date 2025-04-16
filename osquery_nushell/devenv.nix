@@ -11,8 +11,8 @@
     pkgs.go-task
     pkgs.osquery
     pkgs.nushell
-    pkgs.gum
     pkgs.jq
+    pkgs.fzf
   ];
 
   

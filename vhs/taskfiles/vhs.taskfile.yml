@@ -3,4 +3,9 @@ version: '3'
 tasks:
   process:
     cmds:
-      - vhs {{.VHS_TAPE}} 
+      - vhs {{.VHS_TAPE}} -o {{.VHS_OUTPUT}}
+    vars:
+      VHS_TAPE: 
+        sh: ls tools/*.tape | fzf
+      VHS_OUTPUT:
+        sh: echo {{.VHS_TAPE}} | sed 's/\.tape/\.gif/g'

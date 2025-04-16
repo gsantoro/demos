@@ -1,0 +1,14 @@
+version: '3'
+
+# direnv: setup https://direnv.net/docs/hook.html
+
+tasks:
+  test:
+    cmds: 
+      - echo {{.REPLICATE_TOKEN}}
+      - echo {{.HF_TOKEN}}
+    vars:
+      HF_TOKEN:
+        sh: eval $(op signin) && op read {{.HF_TOKEN_PATH}}
+      REPLICATE_TOKEN:
+        sh: eval $(op signin) && op read {{.REPLICATE_TOKEN_PATH}}
